@@ -10,7 +10,7 @@ export const SITE = {
     "I build web applications, ship games, and design interfaces — dark, fast and deliberate.",
   domain: "ardmst.my.id",
   location: "Indonesia",
-  email: "hello@ardmst.my.id",
+  email: "contact@ardmst.my.id",
   availability: "Open for freelance & full-time",
 } as const;
 
