@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 832 1040" width="832" height="1040" role="img" aria-label="Monochrome profile portrait placeholder">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="headShade" cx="42%" cy="36%" r="62%">
+      <stop offset="0%" stop-color="#6b6b76"/>
+      <stop offset="55%" stop-color="#3d3d46"/>
+      <stop offset="100%" stop-color="#1c1c22"/>
+    </radialGradient>
+    <linearGradient id="torsoShade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4a4a55"/>
+      <stop offset="50%" stop-color="#26262e"/>
+      <stop offset="100%" stop-color="#101014"/>
+    </linearGradient>
+    <linearGradient id="neckShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2c2c34"/>
+      <stop offset="100%" stop-color="#0e0e12"/>
+    </linearGradient>
+    <linearGradient id="hairShade" x1="0.2" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#3a3a44"/>
+      <stop offset="60%" stop-color="#1a1a20"/>
+      <stop offset="100%" stop-color="#0b0b0e"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#93c5fd" stop-opacity="0.95"/>
+      <stop offset="60%" stop-color="#3b82f6" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="scan" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1" fill="#ffffff" opacity="0.03"/>
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#09090b" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#09090b" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="832" height="1040" fill="#09090b"/>
+
+  <!-- grid -->
+  <g opacity="0.6">
+    <g stroke="#1c1c20" stroke-width="1">
+      <line x1="0" y1="0" x2="832" y2="0"/><line x1="0" y1="104" x2="832" y2="104"/>
+      <line x1="0" y1="208" x2="832" y2="208"/><line x1="0" y1="312" x2="832" y2="312"/>
+      <line x1="0" y1="416" x2="832" y2="416"/><line x1="0" y1="520" x2="832" y2="520"/>
+      <line x1="0" y1="624" x2="832" y2="624"/><line x1="0" y1="728" x2="832" y2="728"/>
+      <line x1="0" y1="832" x2="832" y2="832"/><line x1="0" y1="936" x2="832" y2="936"/>
+      <line x1="104" y1="0" x2="104" y2="1040"/><line x1="208" y1="0" x2="208" y2="1040"/>
+      <line x1="312" y1="0" x2="312" y2="1040"/><line x1="416" y1="0" x2="416" y2="1040"/>
+      <line x1="520" y1="0" x2="520" y2="1040"/><line x1="624" y1="0" x2="624" y2="1040"/>
+      <line x1="728" y1="0" x2="728" y2="1040"/>
+    </g>
+  </g>
+
+  <rect width="832" height="1040" fill="url(#bgGlow)"/>
+
+  <!-- portrait silhouette -->
+  <g>
+    <!-- shoulders / torso -->
+    <path d="M96 1040 C 96 838, 234 736, 416 736 C 598 736, 736 838, 736 1040 Z" fill="url(#torsoShade)"/>
+    <!-- collar highlight -->
+    <path d="M330 792 C 370 830, 462 830, 502 792 L 512 812 C 466 856, 366 856, 320 812 Z" fill="#5a5a66" opacity="0.55"/>
+
+    <!-- neck -->
+    <path d="M344 604 h144 v132 c0 34 -144 34 -144 0 Z" fill="url(#neckShade)"/>
+
+    <!-- head -->
+    <ellipse cx="416" cy="446" rx="164" ry="202" fill="url(#headShade)"/>
+
+    <!-- hair mass -->
+    <path d="M252 424 c 0 -146 74 -218 164 -218 c 90 0 164 72 164 218 c -22 -84 -72 -126 -164 -126 c -92 0 -142 42 -164 126 Z" fill="url(#hairShade)"/>
+
+    <!-- brow + eye sockets -->
+    <g fill="#15151a" opacity="0.85">
+      <ellipse cx="352" cy="432" rx="26" ry="10"/>
+      <ellipse cx="480" cy="432" rx="26" ry="10"/>
+    </g>
+    <!-- nose + mouth shadow -->
+    <g fill="#17171d" opacity="0.75">
+      <path d="M416 452 l 14 62 l -28 0 Z"/>
+      <rect x="374" y="556" width="84" height="9" rx="4.5"/>
+    </g>
+
+    <!-- jaw shading -->
+    <path d="M300 500 C 322 596, 372 636, 416 636 C 460 636, 510 596, 532 500 C 520 596, 470 648, 416 648 C 362 648, 312 596, 300 500 Z" fill="#16161b" opacity="0.6"/>
+
+    <!-- rim light (left key light) -->
+    <path d="M254 414 c -8 186 46 348 104 430" stroke="url(#rim)" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M582 408 c 8 186 -46 348 -104 430" stroke="url(#rim)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.55"/>
+    <!-- shoulder rim -->
+    <path d="M96 1040 c 0 -152 82 -258 222 -302" stroke="url(#rim)" stroke-width="5" fill="none" opacity="0.5"/>
+  </g>
+
+  <rect width="832" height="1040" fill="url(#scan)"/>
+
+  <!-- corner brackets -->
+  <g stroke="#3b82f6" stroke-width="3" fill="none">
+    <path d="M44 92 v-48 h48"/>
+    <path d="M788 92 v-48 h-48"/>
+    <path d="M44 948 v48 h48"/>
+    <path d="M788 948 v48 h-48"/>
+  </g>
+
+  <!-- reticle -->
+  <g stroke="#52525b" stroke-width="1.5" opacity="0.75">
+    <line x1="416" y1="150" x2="416" y2="184"/>
+    <line x1="416" y1="712" x2="416" y2="746"/>
+    <line x1="130" y1="446" x2="164" y2="446"/>
+    <line x1="668" y1="446" x2="702" y2="446"/>
+  </g>
+
+  <rect width="832" height="1040" fill="url(#fade)"/>
+
+  <text x="48" y="1000" font-family="ui-monospace, monospace" font-size="20" letter-spacing="6" fill="#71717a">PROFILE / GRAYSCALE</text>
+</svg>

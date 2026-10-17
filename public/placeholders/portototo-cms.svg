@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-label="Portototo CMS">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fade" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#09090b" stop-opacity="0.95"/>
+      <stop offset="60%" stop-color="#09090b" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="750" fill="#09090b"/>
+  <g opacity="0.5"><line x1="0" y1="0" x2="0" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="60" y1="0" x2="60" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="120" y1="0" x2="120" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="180" y1="0" x2="180" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="240" y1="0" x2="240" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="300" y1="0" x2="300" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="360" y1="0" x2="360" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="420" y1="0" x2="420" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="480" y1="0" x2="480" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="540" y1="0" x2="540" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="600" y1="0" x2="600" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="660" y1="0" x2="660" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="720" y1="0" x2="720" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="780" y1="0" x2="780" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="840" y1="0" x2="840" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="900" y1="0" x2="900" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="960" y1="0" x2="960" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="1020" y1="0" x2="1020" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="1080" y1="0" x2="1080" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="1140" y1="0" x2="1140" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="1200" y1="0" x2="1200" y2="750" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="0" x2="1200" y2="0" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="60" x2="1200" y2="60" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="120" x2="1200" y2="120" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="180" x2="1200" y2="180" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="240" x2="1200" y2="240" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="300" x2="1200" y2="300" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="360" x2="1200" y2="360" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="420" x2="1200" y2="420" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="480" x2="1200" y2="480" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="540" x2="1200" y2="540" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="600" x2="1200" y2="600" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="660" x2="1200" y2="660" stroke="#1c1c20" stroke-width="1"/><line x1="0" y1="720" x2="1200" y2="720" stroke="#1c1c20" stroke-width="1"/></g>
+  
+      <g>
+        <rect x="90" y="120" width="1020" height="520" rx="14" fill="#101014" stroke="#27272a"/>
+        <rect x="90" y="120" width="1020" height="46" rx="14" fill="#18181b"/>
+        <circle cx="126" cy="143" r="6" fill="#3f3f46"/>
+        <circle cx="148" cy="143" r="6" fill="#3f3f46"/>
+        <circle cx="170" cy="143" r="6" fill="#3b82f6"/>
+        <rect x="210" y="133" width="420" height="20" rx="10" fill="#0b0b0e" stroke="#27272a"/>
+        <rect x="130" y="200" width="300" height="18" rx="9" fill="#3b82f6"/>
+        <rect x="130" y="232" width="500" height="10" rx="5" fill="#3f3f46"/>
+        <rect x="130" y="252" width="380" height="10" rx="5" fill="#27272a"/>
+        <rect x="130" y="300" width="290" height="180" rx="10" fill="#18181b" stroke="#27272a"/>
+        <rect x="445" y="300" width="290" height="180" rx="10" fill="#18181b" stroke="#27272a"/>
+        <rect x="760" y="300" width="290" height="180" rx="10" fill="#18181b" stroke="#3b82f6" stroke-opacity="0.6"/>
+        <rect x="130" y="510" width="180" height="100" rx="10" fill="#0b0b0e" stroke="#27272a"/>
+        <rect x="330" y="510" width="180" height="100" rx="10" fill="#0b0b0e" stroke="#27272a"/>
+      </g>
+  <rect width="1200" height="750" fill="url(#glow)"/>
+  <rect width="1200" height="750" fill="url(#fade)"/>
+  <text x="60" y="658" font-family="ui-monospace, monospace" font-size="26" fill="#3b82f6" letter-spacing="4">// WEB & APP</text>
+  <text x="60" y="702" font-family="system-ui, sans-serif" font-size="46" font-weight="600" fill="#fafafa">Portototo CMS</text>
+</svg>
