@@ -28,11 +28,11 @@ export function SiteHeader() {
     >
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5">
         <Link href="#home" className="group flex items-center gap-2.5">
-          <span className="flex size-8 items-center justify-center rounded-md border border-edge bg-surface text-accent transition-colors group-hover:border-accent/60">
-            <Terminal className="size-4" />
+          <span className="relative flex size-8 items-center justify-center overflow-hidden rounded-md border border-edge bg-surface transition-all duration-300 group-hover:border-accent/70 group-hover:shadow-[0_0_15px_rgba(59,130,246,0.35)]">
+            <img src="/favicon.svg" alt="logo" className="size-5 object-contain" />
           </span>
-          <span className="font-mono text-sm tracking-tight text-fg">
-            {SITE.name.toLowerCase()}
+          <span className="font-mono text-sm tracking-tight text-fg transition-colors group-hover:text-accent-soft">
+            &gt;_ {SITE.name.toLowerCase()}
             <span className="text-accent">.dev</span>
           </span>
         </Link>

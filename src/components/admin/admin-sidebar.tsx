@@ -24,14 +24,14 @@ export function AdminSidebar({ email, mode }: AdminSidebarProps) {
   return (
     <aside className="flex w-full shrink-0 flex-col border-b border-edge bg-surface/60 lg:min-h-dvh lg:w-64 lg:border-b-0 lg:border-r">
       <div className="flex items-center gap-2.5 px-5 py-4">
-        <span className="flex size-8 items-center justify-center rounded-md border border-edge bg-elevated text-accent">
-          <Terminal className="size-4" />
+        <span className="relative flex size-8 items-center justify-center overflow-hidden rounded-md border border-edge bg-elevated shadow-[0_0_15px_-4px_rgba(59,130,246,0.3)]">
+          <img src="/favicon.svg" alt="logo" className="size-5 object-contain" />
         </span>
         <div className="min-w-0">
-          <p className="font-mono text-xs text-fg">
-            ardmst<span className="text-accent">.dev</span>
+          <p className="font-mono text-xs font-semibold text-fg">
+            &gt;_ ardmst<span className="text-accent">.dev</span>
           </p>
-          <p className="font-mono text-[0.65rem] uppercase tracking-wider text-fg-subtle">
+          <p className="font-mono text-[0.65rem] uppercase tracking-wider text-accent-soft">
             admin cms
           </p>
         </div>

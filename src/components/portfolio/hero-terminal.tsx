@@ -297,16 +297,22 @@ export function HeroTerminal({ skills, projects }: HeroTerminalProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: reduced ? 0 : 0.35 }}
       onClick={() => inputRef.current?.focus()}
-      className="relative w-full overflow-hidden rounded-xl border border-edge bg-[#0b0b0e] shadow-2xl shadow-black/60"
+      className="relative w-full overflow-hidden rounded-xl border border-edge/80 bg-[#0b0b0e] shadow-[0_0_50px_-20px_rgba(59,130,246,0.25)] transition-all duration-300 hover:border-accent/50 hover:shadow-[0_0_60px_-15px_rgba(59,130,246,0.35)]"
     >
-      <div className="flex items-center gap-2 border-b border-edge bg-surface/80 px-4 py-2.5">
-        <span className="size-2.5 rounded-full bg-zinc-700" />
-        <span className="size-2.5 rounded-full bg-zinc-700" />
-        <span className="size-2.5 rounded-full bg-accent/70" />
-        <span className="ml-2 flex items-center gap-1.5 font-mono text-[0.7rem] text-fg-subtle">
-          <TerminalSquare className="size-3" />
-          profile.sh — /dev/ardmst
-        </span>
+      <div className="flex items-center justify-between border-b border-edge/80 bg-surface/90 px-4 py-2.5 backdrop-blur-md">
+        <div className="flex items-center gap-2">
+          <span className="size-2.5 rounded-full bg-red-500/70" />
+          <span className="size-2.5 rounded-full bg-amber-500/70" />
+          <span className="size-2.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+          <span className="ml-2 flex items-center gap-1.5 font-mono text-[0.7rem] text-fg-subtle">
+            <TerminalSquare className="size-3 text-accent" />
+            profile.sh — /dev/ardmst
+          </span>
+        </div>
+        <div className="hidden items-center gap-1.5 font-mono text-[0.65rem] text-fg-subtle sm:flex">
+          <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          online
+        </div>
       </div>
 
       <div className="terminal-scan relative">
@@ -372,8 +378,9 @@ export function HeroTerminal({ skills, projects }: HeroTerminalProps) {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-1.5 border-t border-edge bg-surface/60 px-3 py-2.5">
-        {["help", "skills", "projects", "contact", "clear"].map((command) => (
+      <div className="flex flex-wrap items-center gap-1.5 border-t border-edge/80 bg-surface/80 px-3 py-2.5 backdrop-blur-sm">
+        <span className="mr-1 font-mono text-[0.65rem] uppercase tracking-wider text-fg-subtle">Quick:</span>
+        {["help", "cat profile.json", "skills", "projects", "contact", "clear"].map((command) => (
           <button
             key={command}
             type="button"
@@ -383,7 +390,7 @@ export function HeroTerminal({ skills, projects }: HeroTerminalProps) {
               runCommand(command);
               inputRef.current?.focus();
             }}
-            className="rounded border border-edge bg-elevated px-2 py-1 font-mono text-[0.7rem] text-fg-subtle transition-colors hover:border-accent/60 hover:text-accent-soft disabled:opacity-40"
+            className="rounded-md border border-edge/80 bg-elevated/80 px-2 py-0.5 font-mono text-[0.68rem] text-fg-subtle transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:bg-accent/10 hover:text-accent-soft hover:shadow-[0_0_12px_rgba(59,130,246,0.3)] disabled:opacity-40"
           >
             {command}
           </button>

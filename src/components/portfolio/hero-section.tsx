@@ -45,10 +45,14 @@ export function HeroSection({ skills, projects }: HeroSectionProps) {
   return (
     <section id="home" className="relative overflow-hidden pt-28 pb-16 sm:pt-32 sm:pb-24">
       {/* Backdrop */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 grid-backdrop opacity-[0.35]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 grid-backdrop opacity-[0.4]" />
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-40 left-1/4 size-[38rem] rounded-full bg-accent/10 blur-[140px] animate-glow-pulse"
+        className="pointer-events-none absolute -top-40 left-1/4 size-[40rem] rounded-full bg-accent/15 blur-[150px] animate-glow-pulse"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-1/2 -right-32 size-[32rem] rounded-full bg-accent-deep/10 blur-[130px] animate-glow-pulse"
       />
       <div
         aria-hidden
@@ -69,22 +73,24 @@ export function HeroSection({ skills, projects }: HeroSectionProps) {
           </motion.div>
 
           <motion.div {...reveal(0.15)} className="mt-6 space-y-3">
-            <div className="flex items-center gap-2 font-mono text-xs text-emerald-400">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-950/30 px-2.5 py-1 font-mono text-xs text-emerald-400 backdrop-blur-sm">
               <Radio className="size-3 animate-pulse" />
               {SITE.availability}
             </div>
 
             <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight text-fg sm:text-4xl">
-              {SITE.fullName}
+              <span className="bg-gradient-to-r from-fg via-fg to-accent-soft bg-clip-text text-transparent">
+                {SITE.fullName}
+              </span>
             </h1>
 
-            <p className="font-mono text-sm text-accent-soft">{SITE.role}</p>
+            <p className="font-mono text-sm font-medium text-accent-soft tracking-wide">{SITE.role}</p>
 
             <p className="text-sm leading-relaxed text-fg-muted">{SITE.tagline}</p>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1 font-mono text-xs text-fg-subtle">
-              <span className="flex items-center gap-1.5">
-                <MapPin className="size-3" />
+              <span className="flex items-center gap-1.5 rounded-md border border-edge bg-surface/50 px-2 py-0.5">
+                <MapPin className="size-3 text-accent" />
                 {SITE.location}
               </span>
             </div>
