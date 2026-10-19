@@ -1,5 +1,5 @@
 -- ===========================================================================
--- Portototo — 01_schema.sql
+-- Ardmst — 01_schema.sql
 -- Tables, indexes, updated_at trigger and Row Level Security for the
 -- portfolio CMS. Mirrors PRD chapter 4.
 --
@@ -63,6 +63,19 @@ create table if not exists public.messages (
 create index if not exists messages_unread_idx on public.messages (is_read, created_at desc);
 
 -- ---------------------------------------------------------------------------
+-- site_settings
+-- ---------------------------------------------------------------------------
+create table if not exists public.site_settings (
+  key varchar(100) primary key,
+  value text not null,
+  updated_at timestamptz not null default now()
+);
+
+create trigger site_settings_touch_updated_at
+  before update on public.site_settings
+  for each row execute function public.touch_updated_at();
+
+-- ---------------------------------------------------------------------------
 -- updated_at maintenance
 -- ---------------------------------------------------------------------------
 create or replace function public.touch_updated_at()
@@ -90,6 +103,7 @@ create trigger projects_touch_updated_at
 alter table public.projects enable row level security;
 alter table public.skills   enable row level security;
 alter table public.messages enable row level security;
+alter table public.site_settings enable row level security;
 
 -- projects: world-readable, authenticated-only writes
 drop policy if exists "projects are publicly readable" on public.projects;
@@ -113,6 +127,19 @@ create policy "skills are publicly readable"
 drop policy if exists "skills are writable by authenticated" on public.skills;
 create policy "skills are writable by authenticated"
   on public.skills for all
+  to authenticated
+  using (true)
+  with check (true);
+
+-- site_settings: world-readable, authenticated-only writes
+drop policy if exists "site_settings are publicly readable" on public.site_settings;
+create policy "site_settings are publicly readable"
+  on public.site_settings for select
+  using (true);
+
+drop policy if exists "site_settings are writable by authenticated" on public.site_settings;
+create policy "site_settings are writable by authenticated"
+  on public.site_settings for all
   to authenticated
   using (true)
   with check (true);

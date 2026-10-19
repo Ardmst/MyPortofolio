@@ -65,8 +65,8 @@ Recomputing many vision cones per frame was killing the CPU budget. Moved the vi
   },
   {
     id: "33333333-3333-4333-8333-333333333333",
-    title: "Portototo CMS",
-    slug: "portototo-cms",
+    title: "Portfolio CMS",
+    slug: "portfolio-cms",
     category: "web_app",
     summary:
       "This portfolio — Next.js App Router, Supabase Postgres/Storage/Auth and a protected admin CMS.",
@@ -83,10 +83,10 @@ The site you are looking at. A public showcase plus a full CMS so projects, skil
 ### Hardest problem
 Server-rendering a modal-driven gallery without shipping the whole dataset to the client. Solved by rendering only summaries on the server and fetching gallery detail lazily per slug.`,
     tech_stack: ["Next.js", "TypeScript", "Supabase", "Tailwind CSS"],
-    thumbnail_url: "/placeholders/portototo-cms.svg",
-    gallery_urls: ["/placeholders/portototo-cms.svg", "/placeholders/dashboard.svg"],
+    thumbnail_url: "/placeholders/portfolio-cms.svg",
+    gallery_urls: ["/placeholders/portfolio-cms.svg", "/placeholders/dashboard.svg"],
     demo_url: "https://ardmst.my.id",
-    github_url: "https://github.com/ardmst/portototo",
+    github_url: "https://github.com/Ardmst/MyPortofolio",
     featured: true,
     created_at: iso(20),
     updated_at: iso(1),
@@ -200,7 +200,7 @@ export const SEED_MESSAGES: Message[] = [
     sender_email: "rina@techrecruit.io",
     subject: "Fullstack role — remote",
     message:
-      "Hi Ardi, we are hiring a senior fullstack engineer for a product team. Your Portototo CMS work looks close to what we do. Are you open to a chat this week?",
+      "Hi Ardi, we are hiring a senior fullstack engineer for a product team. Your Portfolio CMS work looks close to what we do. Are you open to a chat this week?",
     is_read: false,
     created_at: iso(1),
   },

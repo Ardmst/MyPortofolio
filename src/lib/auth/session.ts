@@ -16,7 +16,7 @@ function secret(): string {
   const explicit = (process.env.AUTH_SECRET ?? "").trim();
   if (explicit) return explicit;
   // Dev-only derivation; set AUTH_SECRET in production.
-  return `portototo-dev-secret::${localAdminPassword}`;
+  return `ardmst-dev-secret::${localAdminPassword}`;
 }
 
 async function importKey(): Promise<CryptoKey> {

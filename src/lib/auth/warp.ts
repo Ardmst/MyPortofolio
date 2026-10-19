@@ -11,7 +11,7 @@ import {
 } from "@/lib/env";
 
 /**
- * Warp Auth integration — Portototo delegates admin sign-in to the Warp Auth
+ * Warp Auth integration — Ardmst delegates admin sign-in to the Warp Auth
  * service instead of holding its own passwords.
  *
  * The flow is a plain OAuth 2.0 authorization-code redirect hardened with PKCE:
@@ -19,7 +19,7 @@ import {
  *   1. GET /api/auth/warp/start     → 302 to {WARP_AUTH_URL}/authorize
  *   2. GET /api/auth/warp/callback  → POST {WARP_AUTH_URL}/token  (code → token)
  *                                   → GET  {WARP_AUTH_URL}/userinfo (identity)
- *   3. Portototo mints its own signed cookie and the middleware gate passes.
+ *   3. Ardmst mints its own signed cookie and the middleware gate passes.
  *
  * The response parsers below are deliberately tolerant of field-name variants
  * (`access_token` / `accessToken` / `token`, `email` / `email_address`, …) so
@@ -139,7 +139,7 @@ export interface WarpIdentity {
   raw: Json;
 }
 
-/** Normalises the userinfo payload into the fields Portototo cares about. */
+/** Normalises the userinfo payload into the fields Ardmst cares about. */
 export function readIdentity(payload: unknown): WarpIdentity | null {
   const root = asRecord(payload);
   if (!root) return null;

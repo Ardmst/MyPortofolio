@@ -27,7 +27,7 @@ export function ProfilePhoto({ src, alt, className }: ProfilePhotoProps) {
       />
 
       <div className="relative overflow-hidden rounded-2xl border border-edge bg-surface transition-all duration-500 group-hover:border-accent/70 group-hover:shadow-[0_0_50px_-12px_var(--color-accent)]">
-        <div className="relative aspect-4/5 w-full">
+        <div className="relative aspect-square w-full">
           {failed ? (
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-elevated via-surface to-void">
               <User className="size-20 text-edge-strong" strokeWidth={1} />
@@ -38,7 +38,7 @@ export function ProfilePhoto({ src, alt, className }: ProfilePhotoProps) {
               alt={alt}
               fill
               priority
-              sizes="(max-width: 768px) 70vw, 360px"
+              sizes="(max-width: 768px) 240px, 288px"
               className="object-cover contrast-105 transition-all duration-700 group-hover:contrast-115 group-hover:brightness-105"
               onError={() => setFailed(true)}
             />

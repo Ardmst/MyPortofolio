@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { AlertCircle, CheckCircle2, Loader2, Send } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
@@ -106,17 +106,17 @@ export function ContactForm() {
               </p>
             </div>
 
-            <div className="space-y-3 rounded-xl border border-edge bg-surface/60 p-5 font-mono text-xs">
+            <div className="space-y-3 rounded-xl border border-edge bg-surface/60 p-5 font-mono text-xs transition-all duration-300 hover:border-accent/40 hover:shadow-[0_0_25px_rgba(59,130,246,0.25)]">
               <Row label="email" value={SITE.email} />
               <Row label="domain" value={SITE.domain} />
               <Row label="location" value={SITE.location} />
               <Row label="status" value={SITE.availability} accent />
             </div>
 
+            {/* Single text node inside the flex row keeps this flowing inline — no split columns */}
             <p className="flex items-start gap-2 text-xs leading-relaxed text-fg-subtle">
-              <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
-              Messages are stored in the Supabase <code className="text-accent-soft">messages</code>{" "}
-              table and appear in the admin inbox.
+              <Clock className="mt-0.5 size-3.5 shrink-0" />
+              <span>Typically responds within 24&ndash;48 hours for freelance &amp; full-time inquiries.</span>
             </p>
           </div>
 
@@ -127,7 +127,7 @@ export function ContactForm() {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             onSubmit={onSubmit}
             noValidate
-            className="space-y-5 rounded-xl border border-edge bg-surface p-5 sm:p-6"
+            className="space-y-5 rounded-xl border border-edge bg-surface p-5 transition-all duration-300 hover:border-accent/40 hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] sm:p-6"
           >
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Name" htmlFor="sender_name" error={errors.sender_name}>

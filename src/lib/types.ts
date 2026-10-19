@@ -32,6 +32,15 @@ export interface Skill {
   display_order: number;
 }
 
+/** Payload accepted by the create/update skill endpoints. */
+export interface SkillInput {
+  name: string;
+  category: SkillCategory;
+  proficiency: number;
+  icon_name: string | null;
+  display_order: number;
+}
+
 export interface Message {
   id: string;
   sender_name: string;

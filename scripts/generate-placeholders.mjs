@@ -153,7 +153,7 @@ const files = [
   ["neon-runner.svg", "runner", "Neon Runner", "// GAME DEV"],
   ["void-protocol.svg", "stealth", "Void Protocol", "// GAME DEV"],
   ["gameplay.svg", "gameplay", "Gameplay Systems", "// GAME DEV"],
-  ["portototo-cms.svg", "browser", "Portototo CMS", "// WEB & APP"],
+  ["portfolio-cms.svg", "browser", "Portfolio CMS", "// WEB & APP"],
   ["koperasi.svg", "ledger", "Koperasi Digital", "// WEB & APP"],
   ["dashboard.svg", "dashboard", "Admin Dashboard", "// WEB & APP"],
   ["design-system.svg", "tokens", "Ardmst Design System", "// UI/UX DESIGN"],

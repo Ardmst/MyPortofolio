@@ -1,4 +1,11 @@
-import { PROJECT_CATEGORIES, type ProjectCategory, type ProjectInput } from "@/lib/types";
+import {
+  PROJECT_CATEGORIES,
+  SKILL_CATEGORIES,
+  type ProjectCategory,
+  type ProjectInput,
+  type SkillCategory,
+  type SkillInput,
+} from "@/lib/types";
 import { isEmail, isUuid, slugify } from "@/lib/utils";
 
 export type ValidationResult<T> = { ok: true; value: T } | { ok: false; errors: Record<string, string> };
@@ -119,6 +126,55 @@ export function validateMessage(payload: unknown): ValidationResult<ValidatedMes
   return {
     ok: true,
     value: { sender_name, sender_email, subject: subject || null, message },
+  };
+}
+
+/** Validates a skill payload. Proficiency is strictly an integer 1–100. */
+export function validateSkill(payload: unknown): ValidationResult<SkillInput> {
+  const errors: Record<string, string> = {};
+  const body = (payload ?? {}) as Record<string, unknown>;
+
+  const name = asString(body.name).trim();
+  if (name.length < 2) errors.name = "Name must be at least 2 characters.";
+  if (name.length > 100) errors.name = "Name must be 100 characters or fewer.";
+
+  const category = asString(body.category).trim() as SkillCategory;
+  if (!SKILL_CATEGORIES.includes(category)) {
+    errors.category = `Category must be one of: ${SKILL_CATEGORIES.join(", ")}.`;
+  }
+
+  const rawProficiency = body.proficiency;
+  const proficiency =
+    typeof rawProficiency === "number"
+      ? Math.round(rawProficiency)
+      : Number.isFinite(Number(rawProficiency)) && asString(rawProficiency).trim() !== ""
+        ? Math.round(Number(rawProficiency))
+        : Number.NaN;
+
+  if (!Number.isInteger(proficiency) || proficiency < 1 || proficiency > 100) {
+    errors.proficiency = "Proficiency must be an integer between 1 and 100.";
+  }
+
+  const icon_name = asString(body.icon_name).trim();
+  if (icon_name.length > 50) errors.icon_name = "Icon name must be 50 characters or fewer.";
+
+  const rawOrder = body.display_order ?? 0;
+  const display_order =
+    typeof rawOrder === "number"
+      ? Math.round(rawOrder)
+      : Number.isFinite(Number(rawOrder)) && asString(rawOrder).trim() !== ""
+        ? Math.round(Number(rawOrder))
+        : Number.NaN;
+
+  if (!Number.isInteger(display_order) || display_order < 0) {
+    errors.display_order = "Display order must be a non-negative integer.";
+  }
+
+  if (Object.keys(errors).length > 0) return { ok: false, errors };
+
+  return {
+    ok: true,
+    value: { name, category, proficiency, icon_name: icon_name || null, display_order },
   };
 }
 

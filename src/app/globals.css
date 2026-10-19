@@ -285,3 +285,20 @@ body {
   border-color: var(--color-edge);
   margin: 1.5em 0;
 }
+
+/* ------------------------------------------------------------------------- */
+/* Reduced motion — honor the OS preference across CSS animations/transitions */
+/* ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

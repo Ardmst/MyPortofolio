@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { CornerDownLeft, TerminalSquare } from "lucide-react";
 import { PROJECT_CATEGORY_LABELS, SITE, SKILL_CATEGORY_LABELS } from "@/lib/constants";
 import type { Project, Skill } from "@/lib/types";
@@ -40,6 +40,7 @@ export function HeroTerminal({ skills, projects }: HeroTerminalProps) {
   const [input, setInput] = useState("");
   const [autoTyping, setAutoTyping] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const reduced = useReducedMotion();
   const nextId = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -264,6 +265,13 @@ export function HeroTerminal({ skills, projects }: HeroTerminalProps) {
     };
 
     const run = async () => {
+      if (reduced) {
+        /* Reduced motion: skip the typewriter, render the transcript instantly. */
+        setReady(true);
+        runCommand("cat profile.json");
+        runCommand("help");
+        return;
+      }
       await sleep(600);
       if (cancelled) return;
       setReady(true);
@@ -275,7 +283,7 @@ export function HeroTerminal({ skills, projects }: HeroTerminalProps) {
     return () => {
       cancelled = true;
     };
-  }, [runCommand]);
+  }, [runCommand, reduced]);
 
   /* Keep the buffer pinned to the newest line. */
   useEffect(() => {
@@ -285,9 +293,9 @@ export function HeroTerminal({ skills, projects }: HeroTerminalProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 18 }}
+      initial={reduced ? false : { opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: reduced ? 0 : 0.35 }}
       onClick={() => inputRef.current?.focus()}
       className="relative w-full overflow-hidden rounded-xl border border-edge bg-[#0b0b0e] shadow-2xl shadow-black/60"
     >
@@ -307,7 +315,7 @@ export function HeroTerminal({ skills, projects }: HeroTerminalProps) {
           className="h-[21rem] overflow-y-auto px-4 py-3 font-mono text-[0.8rem] leading-relaxed sm:h-[23rem]"
         >
           <LineText className="text-fg-subtle">
-            Portototo shell v1.0.0 — type <span className="text-accent-soft">help</span> to list commands.
+            ardmst shell v1.0.0 — type <span className="text-accent-soft">help</span> to list commands.
           </LineText>
           <div className="h-2" />
 

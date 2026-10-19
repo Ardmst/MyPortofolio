@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, MessagesSquare, Users, FolderKanban, Terminal } from "lucide-react";
+import { LayoutDashboard, MessagesSquare, Sparkles, Users, FolderKanban, Terminal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/admin", label: "Overview", Icon: LayoutDashboard, exact: true },
   { href: "/admin/projects", label: "Projects", Icon: FolderKanban, exact: false },
+  { href: "/admin/skills", label: "Skills", Icon: Sparkles, exact: false },
   { href: "/admin/messages", label: "Messages", Icon: MessagesSquare, exact: false },
 ] as const;
 
@@ -28,7 +29,7 @@ export function AdminSidebar({ email, mode }: AdminSidebarProps) {
         </span>
         <div className="min-w-0">
           <p className="font-mono text-xs text-fg">
-            portototo<span className="text-accent">.dev</span>
+            ardmst<span className="text-accent">.dev</span>
           </p>
           <p className="font-mono text-[0.65rem] uppercase tracking-wider text-fg-subtle">
             admin cms

@@ -7,8 +7,8 @@
  */
 
 const base = process.argv[2] ?? "http://localhost:3000";
-const email = process.env.LOCAL_ADMIN_EMAIL ?? "admin@portototo.local";
-const password = process.env.LOCAL_ADMIN_PASSWORD ?? "portototo";
+const email = process.env.LOCAL_ADMIN_EMAIL ?? "admin@ardmst.local";
+const password = process.env.LOCAL_ADMIN_PASSWORD ?? "ardmst";
 
 let cookie = "";
 let passed = 0;
@@ -53,7 +53,7 @@ async function json(path, init) {
   return { response, body };
 }
 
-console.log(`\n== Portototo admin verification @ ${base} ==\n`);
+console.log(`\n== Ardmst admin verification @ ${base} ==\n`);
 
 /* ------------------------------------------------------------------ login */
 console.log("AUTHENTICATION");
@@ -113,8 +113,8 @@ let projectSlug = "";
       description_markdown:
         "## Smoke test\nThis row is created, updated and deleted by the verification script.",
       tech_stack: ["Next.js", "Supabase"],
-      thumbnail_url: "/placeholders/portototo-cms.svg",
-      gallery_urls: ["/placeholders/portototo-cms.svg"],
+      thumbnail_url: "/placeholders/portfolio-cms.svg",
+      gallery_urls: ["/placeholders/portfolio-cms.svg"],
       demo_url: "https://example.com",
       github_url: null,
       featured: false,
@@ -135,7 +135,7 @@ let projectSlug = "";
       summary: "Should be rejected because the slug is already taken.",
       description_markdown: "## Duplicate slug test row for the repository layer.",
       tech_stack: ["Next.js"],
-      thumbnail_url: "/placeholders/portototo-cms.svg",
+      thumbnail_url: "/placeholders/portfolio-cms.svg",
     }),
   });
   check("duplicate slug rejected (409)", duplicate.response.status === 409, duplicate.body.error ?? "");

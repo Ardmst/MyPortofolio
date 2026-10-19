@@ -1,5 +1,5 @@
 -- ===========================================================================
--- Portototo — storage.sql
+-- Ardmst — storage.sql
 -- Creates the `portfolio-media` bucket and its access policies.
 -- Mirrors the uploader in src/lib/data/repository.ts (uploadMedia).
 -- ===========================================================================

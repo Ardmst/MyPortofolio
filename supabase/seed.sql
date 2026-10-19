@@ -1,5 +1,5 @@
 -- ===========================================================================
--- Portototo — seed.sql
+-- Ardmst — seed.sql
 -- Demo content so the public site is never empty while developing.
 -- Mirrors src/lib/data/seed.ts (the local fallback store).
 --
@@ -39,16 +39,16 @@ values
     false
   ),
   (
-    'Portototo CMS',
-    'portototo-cms',
+    'Portfolio CMS',
+    'portfolio-cms',
     'web_app',
     'This portfolio — Next.js App Router, Supabase Postgres/Storage/Auth and a protected admin CMS.',
     E'## Overview\nThe site you are looking at: a public showcase plus a full CMS so projects, skills and contact messages are managed without touching code.\n\n### What I built\n- Next.js App Router with server components and route handlers\n- Supabase Postgres schema with RLS for `projects`, `skills`, `messages`\n- Cookie-based admin session + middleware protection for `/admin/*`\n- Media uploader writing to the `portfolio-media` storage bucket',
     array['Next.js', 'TypeScript', 'Supabase', 'Tailwind CSS'],
-    '/placeholders/portototo-cms.svg',
-    array['/placeholders/portototo-cms.svg', '/placeholders/dashboard.svg'],
+    '/placeholders/portfolio-cms.svg',
+    array['/placeholders/portfolio-cms.svg', '/placeholders/dashboard.svg'],
     'https://ardmst.my.id',
-    'https://github.com/ardmst/portototo',
+    'https://github.com/Ardmst/MyPortofolio',
     true
   ),
   (
@@ -121,7 +121,7 @@ insert into public.messages (sender_name, sender_email, subject, message, is_rea
 values
   (
     'Rina Kusuma', 'rina@techrecruit.io', 'Fullstack role — remote',
-    'Hi Ardi, we are hiring a senior fullstack engineer for a product team. Your Portototo CMS work looks close to what we do. Are you open to a chat this week?',
+    'Hi Ardi, we are hiring a senior fullstack engineer for a product team. Your Portfolio CMS work looks close to what we do. Are you open to a chat this week?',
     false
   ),
   (

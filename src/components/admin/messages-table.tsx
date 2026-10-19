@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Check,
   ChevronLeft,
@@ -40,7 +41,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { Message } from "@/lib/types";
-import { formatDate, initials, relativeTime } from "@/lib/utils";
+import { countUnread, formatDate, initials, relativeTime } from "@/lib/utils";
 
 const PAGE_SIZE = 6;
 
@@ -51,6 +52,7 @@ interface MessagesTableProps {
 }
 
 export function MessagesTable({ messages }: MessagesTableProps) {
+  const router = useRouter();
   const [rows, setRows] = useState(messages);
   const [query, setQuery] = useState("");
   const [readFilter, setReadFilter] = useState<ReadFilter>("all");
@@ -78,7 +80,7 @@ export function MessagesTable({ messages }: MessagesTableProps) {
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
   const paged = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  const unreadCount = rows.filter((message) => !message.is_read).length;
+  const unreadCount = countUnread(rows);
 
   async function toggleRead(message: Message) {
     const isRead = !message.is_read;
@@ -98,6 +100,9 @@ export function MessagesTable({ messages }: MessagesTableProps) {
       current.map((row) => (row.id === message.id ? { ...row, is_read: isRead } : row)),
     );
     setOpen((current) => (current && current.id === message.id ? { ...current, is_read: isRead } : current));
+    // Re-sync the server-rendered inbox badge / dashboard stat with the
+    // persisted state, so both stay derived from the same data.
+    router.refresh();
     toast.success(isRead ? "Marked as read" : "Marked as unread");
   }
 
@@ -109,6 +114,8 @@ export function MessagesTable({ messages }: MessagesTableProps) {
     }
 
     setRows((current) => current.filter((row) => row.id !== message.id));
+    // Keep the server-rendered unread badge and dashboard stat in sync.
+    router.refresh();
     toast.success("Message deleted");
   }
 

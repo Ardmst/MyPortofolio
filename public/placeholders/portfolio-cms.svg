@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-label="Portototo CMS">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-label="Portfolio CMS">
   <defs>
     <radialGradient id="glow" cx="50%" cy="30%" r="70%">
       <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.16"/>
@@ -31,5 +31,5 @@
   <rect width="1200" height="750" fill="url(#glow)"/>
   <rect width="1200" height="750" fill="url(#fade)"/>
   <text x="60" y="658" font-family="ui-monospace, monospace" font-size="26" fill="#3b82f6" letter-spacing="4">// WEB & APP</text>
-  <text x="60" y="702" font-family="system-ui, sans-serif" font-size="46" font-weight="600" fill="#fafafa">Portototo CMS</text>
+  <text x="60" y="702" font-family="system-ui, sans-serif" font-size="46" font-weight="600" fill="#fafafa">Portfolio CMS</text>
 </svg>

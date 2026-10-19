@@ -1,12 +1,13 @@
 import { Inbox, MailWarning } from "lucide-react";
 import { MessagesTable } from "@/components/admin/messages-table";
 import { listMessages } from "@/lib/data/repository";
+import { countUnread } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminMessagesPage() {
   const messages = await listMessages();
-  const unread = messages.filter((message) => !message.is_read).length;
+  const unread = countUnread(messages);
 
   return (
     <div className="space-y-6">

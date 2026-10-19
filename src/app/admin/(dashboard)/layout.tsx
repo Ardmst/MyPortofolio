@@ -26,7 +26,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <span className="flex size-7 items-center justify-center rounded-md border border-edge bg-surface text-accent">
               <Terminal className="size-3.5" />
             </span>
-            <span className="font-mono text-xs text-fg">portototo</span>
+            <span className="font-mono text-xs text-fg">ardmst</span>
           </Link>
 
           <div className="hidden items-center gap-2 lg:flex">

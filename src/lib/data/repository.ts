@@ -19,7 +19,9 @@ import type {
   ProjectCategory,
   ProjectInput,
   Skill,
+  SkillInput,
 } from "@/lib/types";
+import { countUnread } from "@/lib/utils";
 
 /**
  * Single data-access layer for the whole app.
@@ -283,6 +285,88 @@ export async function listSkills(): Promise<Skill[]> {
   }
 }
 
+function normalizeSkill(input: SkillInput): SkillInput {
+  return {
+    name: input.name.trim(),
+    category: input.category,
+    proficiency: Math.round(input.proficiency),
+    icon_name: input.icon_name?.trim() || null,
+    display_order: Math.round(input.display_order),
+  };
+}
+
+export async function createSkill(input: SkillInput): Promise<Skill> {
+  const payload = normalizeSkill(input);
+
+  if (dataMode() === "local") {
+    return withDatabase((store) => {
+      const skill: Skill = { id: newId(), ...payload };
+      store.skills.push(skill);
+      return skill;
+    });
+  }
+
+  try {
+    const supabase = await db();
+    const { data, error } = await supabase.from("skills").insert(payload).select("*").single();
+    if (error) throw error;
+    return data as Skill;
+  } catch (error) {
+    fail(error, "Failed to create the skill.");
+  }
+}
+
+export async function updateSkill(id: string, input: SkillInput): Promise<Skill> {
+  const payload = normalizeSkill(input);
+
+  if (dataMode() === "local") {
+    return withDatabase((store) => {
+      const index = store.skills.findIndex((skill) => skill.id === id);
+      if (index === -1) throw new RepositoryError("Skill not found.", 404);
+
+      const updated: Skill = { ...store.skills[index], ...payload };
+      store.skills[index] = updated;
+      return updated;
+    });
+  }
+
+  try {
+    const supabase = await db();
+    const { data, error } = await supabase
+      .from("skills")
+      .update(payload)
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+    return data as Skill;
+  } catch (error) {
+    fail(error, "Failed to update the skill.");
+  }
+}
+
+export async function deleteSkill(id: string): Promise<{ id: string }> {
+  if (dataMode() === "local") {
+    return withDatabase((store) => {
+      const index = store.skills.findIndex((skill) => skill.id === id);
+      if (index === -1) throw new RepositoryError("Skill not found.", 404);
+
+      store.skills.splice(index, 1);
+      return { id };
+    });
+  }
+
+  try {
+    const supabase = await db();
+    const { data, error } = await supabase.from("skills").delete().eq("id", id).select("id").single();
+    if (error) throw error;
+    return data as { id: string };
+  } catch (error) {
+    fail(error, "Failed to delete the skill.");
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 /* Messages                                                                    */
 /* -------------------------------------------------------------------------- */
@@ -461,7 +545,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   return {
     totalProjects: projects.length,
     byCategory,
-    unreadMessages: messages.filter((message) => !message.is_read).length,
+    unreadMessages: countUnread(messages),
     totalMessages: messages.length,
     totalSkills: skills.length,
   };

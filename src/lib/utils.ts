@@ -78,6 +78,15 @@ export function toVideoEmbed(url: string): { kind: "youtube"; src: string } | { 
   return null;
 }
 
+/**
+ * Single source of truth for "how many messages have not been read".
+ * Every surface (dashboard stat card, inbox header, inbox table) derives
+ * from this helper so the counts can never diverge.
+ */
+export function countUnread(messages: { is_read: boolean }[]): number {
+  return messages.filter((message) => !message.is_read).length;
+}
+
 export function initials(value: string): string {
   return value
     .split(/\s+/)

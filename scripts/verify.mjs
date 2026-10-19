@@ -26,7 +26,7 @@ async function get(path, init) {
   return { response, text };
 }
 
-console.log(`\n== Portototo verification @ ${base} ==\n`);
+console.log(`\n== Ardmst verification @ ${base} ==\n`);
 
 /* ---------------------------------------------------------------- public */
 console.log("PUBLIC PAGE");

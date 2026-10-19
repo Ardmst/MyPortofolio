@@ -23,8 +23,9 @@ export const appUrl = clean(process.env.NEXT_PUBLIC_APP_URL) || "http://localhos
 export const bucket = clean(process.env.NEXT_PUBLIC_SUPABASE_BUCKET) || "portfolio-media";
 
 export const localAdminEmail =
-  clean(process.env.LOCAL_ADMIN_EMAIL) || "admin@portototo.local";
-export const localAdminPassword = clean(process.env.LOCAL_ADMIN_PASSWORD) || "portototo";
+  clean(process.env.LOCAL_ADMIN_EMAIL) || "admin@ardmst.local";
+// Default fallback password ("ardmst"); set LOCAL_ADMIN_PASSWORD in production.
+export const localAdminPassword = clean(process.env.LOCAL_ADMIN_PASSWORD) || "ardmst";
 
 export function isSupabaseConfigured(): boolean {
   if (!supabaseUrl || !supabaseAnonKey) return false;
@@ -48,7 +49,7 @@ export function dataMode(): DataMode {
 /* --------------------------------------------------------------------------
  * Warp Auth (external identity provider)
  *
- * Portototo can delegate admin sign-in to the Warp Auth service. The whole
+ * Ardmst can delegate admin sign-in to the Warp Auth service. The whole
  * integration is dormant until these values are filled in, so the local
  * fallback and Supabase Auth keep working exactly as before.
  * Contract: docs/warp-auth-integration.md
