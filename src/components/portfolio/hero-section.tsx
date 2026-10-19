@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Mail, MapPin, Radio } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Download, MapPin, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { HeroTerminal } from "@/components/portfolio/hero-terminal";
@@ -87,10 +87,6 @@ export function HeroSection({ skills, projects }: HeroSectionProps) {
                 <MapPin className="size-3" />
                 {SITE.location}
               </span>
-              <span className="flex items-center gap-1.5">
-                <Mail className="size-3" />
-                {SITE.email}
-              </span>
             </div>
           </motion.div>
 
@@ -107,6 +103,14 @@ export function HeroSection({ skills, projects }: HeroSectionProps) {
                   View Projects
                   <ArrowDown className="size-4" />
                 </Link>
+              </Button>
+            </motion.div>
+            <motion.div variants={ctaItem}>
+              <Button asChild variant="outline" size="lg">
+                <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+                  Download CV
+                  <Download className="size-4" />
+                </a>
               </Button>
             </motion.div>
             <motion.div variants={ctaItem}>

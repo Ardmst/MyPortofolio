@@ -18,9 +18,6 @@ try {
 }
 
 const nextConfig: NextConfig = {
-  // Required by the Azure VPS / PM2 deployment plan (PRD 8.3): produces
-  // .next/standalone with a self-contained server.js.
-  output: "standalone",
   images: {
     // The design system ships hand-authored SVG artwork (profile frame,
     // placeholder thumbnails). They are served first-party, and the optimizer

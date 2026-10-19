@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="blue" x1="100" y1="48" x2="412" y2="464" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="50%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <!-- Dark rounded background -->
+  <rect width="512" height="512" rx="108" fill="#09090B"/>
+  <!-- Subtle inner shadow -->
+  <rect x="4" y="4" width="504" height="504" rx="104" fill="none" stroke="#1b1b1f" stroke-width="2"/>
+  <!-- Shield outline -->
+  <path d="M256 440C256 440 410 356 410 216V116C410 100 398 88 382 88H130C114 88 102 100 102 116V216C102 356 256 440 256 440Z" stroke="url(#blue)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <!-- Top bracket [ shape connecting to shield top-left -->
+  <path d="M300 128H180C164 128 152 140 152 156V268" stroke="url(#blue)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <!-- Lower swoosh curve -->
+  <path d="M152 268C152 268 156 340 228 364" stroke="url(#blue)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <!-- Two crossing diagonal code lines -->
+  <path d="M212 200L340 300" stroke="url(#blue)" stroke-width="12" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M212 300L340 200" stroke="url(#blue)" stroke-width="12" stroke-linecap="round" filter="url(#glow)"/>
+</svg>
