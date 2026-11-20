@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { RepositoryError, uploadMedia } from "@/lib/data/repository";
+import { uploadMedia } from "@/lib/data/repository";
+import { errorResponse } from "@/lib/api";
 import { getAdminUser } from "@/lib/auth/admin";
 import { dataMode } from "@/lib/env";
 
@@ -35,10 +36,6 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({ data: uploaded, mode: dataMode() }, { status: 201 });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to upload the file." },
-      { status },
-    );
+    return errorResponse(error, "Failed to upload the file.");
   }
 }

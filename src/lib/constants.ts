@@ -1,29 +1,44 @@
+import type { Metadata } from "next";
 import type { ProjectCategory, SkillCategory } from "@/lib/types";
 
+/**
+ * Facts about the owner and the site. Every value here is verified
+ * (see DESIGN.md §3 in the workspace root); do not add claims that are not.
+ */
 export const SITE = {
   name: "Ardmst",
-  /** Handle is derived from the first and last name: Ard(i) M(ustaqim) → ardmst. */
+  /** Handle is derived from the name: Ard(i) M(u)st(aqim) → ardmst. */
   handle: "ardmst",
   fullName: "Rifkhi Ardi Mustaqim",
-  role: "Fullstack Developer & Game Creator",
-  tagline:
-    "I build web applications, ship games, and design interfaces — dark, fast and deliberate.",
-  domain: "ardmst.my.id",
+  title: "Ardmst — Rifkhi Ardi Mustaqim, web apps and games",
+  description:
+    "Rifkhi Ardi Mustaqim builds web apps and games in Indonesia. Two of them are live below: open one, play the other.",
   location: "Indonesia",
   email: "contact@ardmst.my.id",
-  availability: "Open for freelance & full-time",
+  /** The hub: the door to every site on the domain. */
+  hubUrl: "https://ardmst.my.id",
+  githubUrl: "https://github.com/Ardmst",
+  linkedinUrl: "https://linkedin.com/in/ardmst",
 } as const;
+
+/** The existing shield favicon files in `public/` (kept as they are). */
+export const SITE_ICONS: Metadata["icons"] = {
+  icon: [
+    { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    { url: "/favicon.svg", type: "image/svg+xml" },
+    { url: "/favicon.png", sizes: "256x256", type: "image/png" },
+  ],
+  apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+};
+
+/* -------------------------------------------------------------------------- */
+/* Admin CMS labels                                                            */
+/* -------------------------------------------------------------------------- */
 
 export const PROJECT_CATEGORY_LABELS: Record<ProjectCategory, string> = {
   game: "Game Dev",
   web_app: "Web & App",
   design: "UI/UX Design",
-};
-
-export const PROJECT_CATEGORY_DESCRIPTIONS: Record<ProjectCategory, string> = {
-  game: "Unity / Godot builds, gameplay systems and prototypes.",
-  web_app: "Production web apps, APIs and tooling.",
-  design: "Interface systems, prototypes and visual identity.",
 };
 
 /** `all` is a virtual filter, not a database value. */
@@ -44,29 +59,6 @@ export const SKILL_CATEGORY_LABELS: Record<SkillCategory, string> = {
 
 export const SKILL_CATEGORY_ORDER: SkillCategory[] = ["programming", "game_dev", "design"];
 
-export const SKILL_CATEGORY_DESCRIPTIONS_MAP: Record<SkillCategory, string> = {
-  programming: "languages & runtimes",
-  game_dev: "engines & systems",
-  design: "tools & process",
-};
-
-export const SKILL_NAME_ICONS: Record<string, string> = {
-  TypeScript: "FileCode2",
-  "React / Next.js": "Atom",
-  "Node.js": "Server",
-  "PostgreSQL / SQL": "Database",
-  "C#": "Hash",
-  Unity: "Gamepad2",
-  Godot: "Boxes",
-  "Gameplay Systems": "Cpu",
-  Blender: "Box",
-  "Shader / VFX": "Sparkles",
-  Figma: "Figma",
-  "Design Systems": "LayoutGrid",
-  "UI Motion": "Wand2",
-  Prototyping: "MousePointerClick",
-};
-
 export const TECH_STACK_SUGGESTIONS = [
   "Next.js",
   "React",
@@ -83,23 +75,3 @@ export const TECH_STACK_SUGGESTIONS = [
   "PostgreSQL",
   "Flutter",
 ];
-
-export const BUCKET =
-  process.env.NEXT_PUBLIC_SUPABASE_BUCKET?.trim() || "portfolio-media";
-
-/** Terminal commands advertised in the hero terminal. */
-export const TERMINAL_COMMANDS = [
-  "cat profile.json",
-  "help",
-  "skills",
-  "projects",
-  "contact",
-  "clear",
-] as const;
-
-export const NAV_LINKS = [
-  { href: "#home", label: "Home" },
-  { href: "#projects", label: "Projects" },
-  { href: "#skills", label: "Skills" },
-  { href: "#contact", label: "Contact" },
-] as const;

@@ -1,10 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import {
-  RepositoryError,
-  deleteProject,
-  getProject,
-  updateProject,
-} from "@/lib/data/repository";
+import { revalidatePath } from "next/cache";
+import { deleteProject, getProject, updateProject } from "@/lib/data/repository";
+import { errorResponse } from "@/lib/api";
 import { getAdminUser } from "@/lib/auth/admin";
 import { normalizeIdentifier, validateProject } from "@/lib/validation";
 
@@ -34,11 +31,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     }
     return NextResponse.json({ data: project });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to load the project." },
-      { status },
-    );
+    return errorResponse(error, "Failed to load the project.");
   }
 }
 
@@ -68,13 +61,10 @@ export async function PUT(request: NextRequest, context: RouteContext) {
 
   try {
     const project = await updateProject(identifier, validated.value);
+    revalidatePath("/");
     return NextResponse.json({ data: project });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to update the project." },
-      { status },
-    );
+    return errorResponse(error, "Failed to update the project.");
   }
 }
 
@@ -92,12 +82,9 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
 
   try {
     const removed = await deleteProject(identifier);
+    revalidatePath("/");
     return NextResponse.json({ data: removed });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to delete the project." },
-      { status },
-    );
+    return errorResponse(error, "Failed to delete the project.");
   }
 }

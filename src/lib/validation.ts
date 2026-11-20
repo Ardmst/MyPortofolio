@@ -179,7 +179,12 @@ export function validateSkill(payload: unknown): ValidationResult<SkillInput> {
 }
 
 export function normalizeIdentifier(value: string): string | null {
-  const raw = decodeURIComponent(value ?? "").trim();
+  let raw: string;
+  try {
+    raw = decodeURIComponent(value ?? "").trim();
+  } catch {
+    return null;
+  }
   if (!raw || raw.length > 255) return null;
   if (isUuid(raw)) return raw;
   return /^[a-z0-9-]+$/i.test(raw) ? raw : null;

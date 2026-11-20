@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { isVideoUrl } from "@/lib/admin-utils";
+import { isVideoUrl, skipImageOptimizer } from "@/lib/admin-utils";
 
 interface MediaManagerProps {
   label: string;
@@ -104,7 +104,14 @@ export function MediaManager({
                 {isVideoUrl(url) ? (
                   <video src={url} muted playsInline className="size-full object-cover" />
                 ) : (
-                  <Image src={url} alt="" fill sizes="200px" className="object-cover" />
+                  <Image
+                    src={url}
+                    alt=""
+                    fill
+                    sizes="200px"
+                    className="object-cover"
+                    unoptimized={skipImageOptimizer(url)}
+                  />
                 )}
               </div>
 

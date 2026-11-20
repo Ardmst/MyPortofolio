@@ -1,227 +1,122 @@
 import type { Message, Project, Skill } from "@/lib/types";
 
 /**
- * Seed content for the local fallback store.
- * Mirrors `supabase/seed.sql` so both modes show the same demo data.
+ * Seed content for the local store, mirrored by `supabase/seed.sql`.
+ *
+ * This is real content, not demo filler: the two projects the portfolio
+ * presents, written from verified facts (DESIGN.md §3 in the workspace root).
+ * On a read-only deployment without Supabase this file IS the content source,
+ * so keep every sentence true: no invented clients, users, awards or links.
+ *
+ * Pictures live in `public/work/<slug>/` and are real captures of each project.
  */
 
-const now = Date.now();
-const iso = (offsetDays: number) => new Date(now - offsetDays * 86_400_000).toISOString();
+/** When these rows were written into the seed (not when the projects were made). */
+const SEEDED_AT = "2026-11-20T00:00:00.000Z";
+/** One second later, so Detektif Ekosistem sorts first, as on the public page. */
+const SEEDED_AT_FIRST = "2026-11-20T00:00:01.000Z";
 
 export const SEED_PROJECTS: Project[] = [
   {
     id: "11111111-1111-4111-8111-111111111111",
-    title: "Neon Runner",
-    slug: "neon-runner",
+    title: "Detektif Ekosistem",
+    slug: "detektif-ekosistem",
     category: "game",
     summary:
-      "Endless cyberpunk runner with procedurally generated districts, wall-running and a synthwave soundtrack.",
-    description_markdown: `## Overview
-**Neon Runner** is a vertical-slice endless runner built in Unity 6. The player sprints through procedurally assembled megacity districts, chaining wall-runs and slides to keep the combo multiplier alive.
+      "A top-down pixel-art detective game about the forest and peatland fires of Kalimantan. You walk three hand-laid maps as Detektif Tedy, question a witness, read the data on each clue and decide what it means. Made with Eka.",
+    description_markdown: `## What it is
+A 2D top-down pixel-art detective game about forest and peatland fires in Kalimantan. You play Detektif Tedy and walk three hand-laid maps: a village and forest, the burnt land with fires still active, and the burnt west side giving way to a river village in the rain. On each map you question a witness and examine clues, read the data on each one and choose what to conclude.
 
-### What I built
-- Chunk-based level generator with weighted difficulty curves
-- Custom character controller (coyote time, air control, wall-run lerp)
-- Combo scoring system with server-authoritative daily leaderboard
-- Adaptive synthwave OST that layers stems by combo tier
+Every choice quietly feeds Kolb's learning cycle, and the final report card shows your learning style.
 
-### Hardest problem
-Keeping 60 FPS on mid-range Android while streaming chunks. Solved with object pooling, GPU instancing for the district props, and an async addressable load queue that pre-fetches the next two chunks during idle frames.`,
-    tech_stack: ["Unity", "C#", "Blender", "Addressables"],
-    thumbnail_url: "/placeholders/neon-runner.svg",
-    gallery_urls: ["/placeholders/neon-runner.svg", "/placeholders/gameplay.svg"],
-    demo_url: "https://example.com/neon-runner",
-    github_url: "https://github.com/ardmst/neon-runner",
+## Who made it
+Two people, Ardi and Eka, for a multimedia course (Praktikum Multimedia) in 2026.
+
+## How it is built
+- Godot 4.7 and GDScript: about 7,000 lines in 28 scripts
+- Five autoload managers: game state, Kolb scoring, settings, audio and save
+- Autosave with continue, a minimap and a hint system
+- A footprint trail, drawn with A*, that leads to the exit
+- Footsteps that change with the ground under you
+- Weather overlays: haze, smoke, embers and rain
+
+Three stages with four clues each, about 20–30 minutes. The game is in Indonesian.
+
+## Playing it
+The web build runs in the browser (WebGL 2) on a desktop with a keyboard: WASD or the arrow keys to move, E to interact, Space to advance dialogue, Esc to pause, the mouse for menus. The first load downloads about 48 MB.`,
+    tech_stack: ["Godot 4.7", "GDScript"],
+    thumbnail_url: "/work/detektif-ekosistem/keyart.webp",
+    gallery_urls: [
+      "/work/detektif-ekosistem/stage2-analysis-drone.webp",
+      "/work/detektif-ekosistem/stage2-burnt-forest.webp",
+      "/work/detektif-ekosistem/stage3-rain.webp",
+      "/work/detektif-ekosistem/report-card.webp",
+    ],
+    // The page that hosts the web build on this site (files in public/games/detektif/).
+    demo_url: "/play/detektif",
+    github_url: null,
     featured: true,
-    created_at: iso(42),
-    updated_at: iso(6),
+    created_at: SEEDED_AT_FIRST,
+    updated_at: SEEDED_AT_FIRST,
   },
   {
     id: "22222222-2222-4222-8222-222222222222",
-    title: "Void Protocol",
-    slug: "void-protocol",
-    category: "game",
-    summary:
-      "Top-down stealth prototype in Godot 4 — line-of-sight AI, hackable turrets and a diegetic HUD.",
-    description_markdown: `## Overview
-A stealth prototype where light is the enemy. Guards build a real-time visibility mesh; the player has to break line of sight or hack the network to blind them.
-
-### What I built
-- Vision-cone mesh built from raycasts, redrawn every frame
-- Behaviour-tree guards with search / alert / patrol states
-- Terminal hacking minigame with branching node graph
-- Full controller + keyboard remapping
-
-### Hardest problem
-Recomputing many vision cones per frame was killing the CPU budget. Moved the visibility polygon into a compute-style batched job and only recalculated cones whose owners moved or whose occluders changed.`,
-    tech_stack: ["Godot", "GDScript", "Aseprite"],
-    thumbnail_url: "/placeholders/void-protocol.svg",
-    gallery_urls: ["/placeholders/void-protocol.svg"],
-    demo_url: null,
-    github_url: "https://github.com/ardmst/void-protocol",
-    featured: false,
-    created_at: iso(88),
-    updated_at: iso(30),
-  },
-  {
-    id: "33333333-3333-4333-8333-333333333333",
-    title: "Portfolio CMS",
-    slug: "portfolio-cms",
+    title: "KicauScore",
+    slug: "kicauscore",
     category: "web_app",
     summary:
-      "This portfolio — Next.js App Router, Supabase Postgres/Storage/Auth and a protected admin CMS.",
-    description_markdown: `## Overview
-The site you are looking at. A public showcase plus a full CMS so projects, skills and contact messages are managed without touching code.
+      "A web platform that runs songbird-singing contests: owners book a numbered slot, each judge scores sight and sound from a phone, and the standings rank themselves in front of everyone. Built by a team of five; I led the architecture and ran the server.",
+    description_markdown: `## What it is
+A web platform that runs songbird-singing contests (lomba burung berkicau). Participants register their birds and get a numbered hanging slot (gantangan), a panel of judges scores each bird from their phones, the system averages the judges and ranks the birds, and anyone can watch the live standings.
 
-### What I built
-- Next.js App Router with server components and route handlers
-- Supabase Postgres schema with RLS for \`projects\`, \`skills\`, \`messages\`
-- Cookie-based admin session + middleware protection for \`/admin/*\`
-- Media uploader writing to the \`portfolio-media\` storage bucket
-- Dark monochrome design system with an Electric Blue accent
+## Who made it
+A team of five built it as the final project for a programming course in 2026. My role was project manager, lead architect and DevOps: the MVC and service-layer architecture, the database migrations, the concurrency-safe slot allocation service, the VPS deployment, hardening and releases.
 
-### Hardest problem
-Server-rendering a modal-driven gallery without shipping the whole dataset to the client. Solved by rendering only summaries on the server and fetching gallery detail lazily per slug.`,
-    tech_stack: ["Next.js", "TypeScript", "Supabase", "Tailwind CSS"],
-    thumbnail_url: "/placeholders/portfolio-cms.svg",
-    gallery_urls: ["/placeholders/portfolio-cms.svg", "/placeholders/dashboard.svg"],
-    demo_url: "https://ardmst.my.id",
-    github_url: "https://github.com/Ardmst/MyPortofolio",
-    featured: true,
-    created_at: iso(20),
-    updated_at: iso(1),
-  },
-  {
-    id: "44444444-4444-4444-8444-444444444444",
-    title: "Koperasi Digital",
-    slug: "koperasi-digital",
-    category: "web_app",
-    summary:
-      "Savings & loan platform for a local co-operative: member onboarding, ledgers and repayment schedules.",
-    description_markdown: `## Overview
-A production web app used by a 1,200-member co-operative. Handles member KYC, deposits, loan origination and amortisation schedules.
+## Engineering worth naming
+- Multi-judge scores are averaged in SQL inside a transaction
+- A four-level tie-breaker: total, then audio, then visual, then slot number
+- Scores lock once a category is validated, and every revision is written to an audit log with its reason
+- Slot allocation uses a row lock (\`lockForUpdate\`) backed by a unique constraint, so two payments can never get the same slot
+- Role-based access for admin, judge and participant
+- Standings refresh by 10-second polling
+- 17 automated tests (Pest)
 
-### What I built
-- Role-based dashboards (member, teller, manager)
-- Double-entry ledger with an immutable audit trail
-- Loan amortisation engine with flat and effective interest
-- CSV/PDF statement export and daily reconciliation job
+## Stack
+Laravel 13, PHP 8.4, SQLite, Blade, Tailwind CSS and vanilla JavaScript, served by Nginx and PHP-FPM on an Azure Ubuntu VM behind Cloudflare.
 
-### Hardest problem
-Money must never drift. Every mutation writes a balanced journal entry inside one transaction, and a nightly job asserts that the sum of all postings equals zero.`,
-    tech_stack: ["Next.js", "PostgreSQL", "Prisma", "Tailwind CSS"],
-    thumbnail_url: "/placeholders/koperasi.svg",
-    gallery_urls: ["/placeholders/koperasi.svg"],
-    demo_url: null,
-    github_url: "https://github.com/ardmst/koperasi-digital",
-    featured: false,
-    created_at: iso(150),
-    updated_at: iso(60),
-  },
-  {
-    id: "55555555-5555-4555-8555-555555555555",
-    title: "Ardmst Design System",
-    slug: "ardmst-design-system",
-    category: "design",
-    summary:
-      "Token-first component library: primitive → semantic → component layers, documented in Figma and shipped to code.",
-    description_markdown: `## Overview
-A three-layer token architecture that keeps design and code in sync, plus the component specifications built on top of it.
-
-### What I built
-- Primitive → semantic → component token tiers
-- Figma variables wired to the same JSON the web app imports
-- 40+ documented components with states, spacing and a11y notes
-- Motion guidelines: durations, easings and reduced-motion fallbacks
-
-### Hardest problem
-Naming. Semantic tokens had to survive a full rebrand without touching a single component, which forced strict separation between *what it looks like* and *what it means*.`,
-    tech_stack: ["Figma", "Design Tokens", "Storybook"],
-    thumbnail_url: "/placeholders/design-system.svg",
-    gallery_urls: ["/placeholders/design-system.svg", "/placeholders/tokens.svg"],
-    demo_url: "https://example.com/design-system",
+The names and scores on the live site are seeded demo data.`,
+    tech_stack: ["Laravel 13", "PHP 8.4", "SQLite", "Blade", "Tailwind CSS", "JavaScript", "Nginx", "Cloudflare"],
+    thumbnail_url: "/work/kicauscore/scoreboard-live.webp",
+    gallery_urls: [
+      "/work/kicauscore/scoreboard-live-full.webp",
+      "/work/kicauscore/home.webp",
+      "/work/kicauscore/bird-profile.webp",
+    ],
+    // An ongoing category with ranked entries on the live site (demo data).
+    demo_url: "https://kicaumania.ardmst.my.id/scoreboard/murai-batu-vip-36g",
+    // Deliberately not linked: the owner reviews the repository first.
     github_url: null,
     featured: true,
-    created_at: iso(70),
-    updated_at: iso(14),
-  },
-  {
-    id: "66666666-6666-4666-8666-666666666666",
-    title: "Fintech Dashboard UI",
-    slug: "fintech-dashboard-ui",
-    category: "design",
-    summary:
-      "Dark analytics dashboard concept — dense data tables, sparklines and a monochrome shell with one accent.",
-    description_markdown: `## Overview
-An exploration of how much information a dark dashboard can hold before it becomes noise.
-
-### What I built
-- Information architecture for 9 primary screens
-- Data-table spec: density modes, sticky columns, bulk actions
-- Chart language: one accent colour, everything else greyscale
-- Interactive prototype with real transitions
-
-### Hardest problem
-Making charts readable without colour. Solved with position, weight and opacity hierarchy instead of hue.`,
-    tech_stack: ["Figma", "Framer Motion"],
-    thumbnail_url: "/placeholders/fintech-ui.svg",
-    gallery_urls: ["/placeholders/fintech-ui.svg"],
-    demo_url: null,
-    github_url: null,
-    featured: false,
-    created_at: iso(95),
-    updated_at: iso(40),
+    created_at: SEEDED_AT,
+    updated_at: SEEDED_AT,
   },
 ];
+
+/**
+ * The schema requires a proficiency number, but nobody can measure "82% at
+ * SQL". Every tool gets the same neutral value (the CMS form's own default)
+ * and the public site never shows it: tools are listed by what they were
+ * used for.
+ */
+export const NEUTRAL_PROFICIENCY = 50;
 
 export const SEED_SKILLS: Skill[] = [
-  { id: "a1000000-0000-4000-8000-000000000001", name: "TypeScript", category: "programming", proficiency: 92, icon_name: "FileCode2", display_order: 1 },
-  { id: "a1000000-0000-4000-8000-000000000002", name: "React / Next.js", category: "programming", proficiency: 94, icon_name: "Atom", display_order: 2 },
-  { id: "a1000000-0000-4000-8000-000000000003", name: "Node.js", category: "programming", proficiency: 85, icon_name: "Server", display_order: 3 },
-  { id: "a1000000-0000-4000-8000-000000000004", name: "PostgreSQL / SQL", category: "programming", proficiency: 80, icon_name: "Database", display_order: 4 },
-  { id: "a1000000-0000-4000-8000-000000000005", name: "C#", category: "programming", proficiency: 78, icon_name: "Hash", display_order: 5 },
-
-  { id: "b2000000-0000-4000-8000-000000000001", name: "Unity", category: "game_dev", proficiency: 88, icon_name: "Gamepad2", display_order: 1 },
-  { id: "b2000000-0000-4000-8000-000000000002", name: "Godot", category: "game_dev", proficiency: 74, icon_name: "Boxes", display_order: 2 },
-  { id: "b2000000-0000-4000-8000-000000000003", name: "Gameplay Systems", category: "game_dev", proficiency: 82, icon_name: "Cpu", display_order: 3 },
-  { id: "b2000000-0000-4000-8000-000000000004", name: "Blender", category: "game_dev", proficiency: 66, icon_name: "Box", display_order: 4 },
-  { id: "b2000000-0000-4000-8000-000000000005", name: "Shader / VFX", category: "game_dev", proficiency: 61, icon_name: "Sparkles", display_order: 5 },
-
-  { id: "c3000000-0000-4000-8000-000000000001", name: "Figma", category: "design", proficiency: 90, icon_name: "Figma", display_order: 1 },
-  { id: "c3000000-0000-4000-8000-000000000002", name: "Design Systems", category: "design", proficiency: 87, icon_name: "LayoutGrid", display_order: 2 },
-  { id: "c3000000-0000-4000-8000-000000000003", name: "UI Motion", category: "design", proficiency: 79, icon_name: "Wand2", display_order: 3 },
-  { id: "c3000000-0000-4000-8000-000000000004", name: "Prototyping", category: "design", proficiency: 83, icon_name: "MousePointerClick", display_order: 4 },
+  { id: "a1000000-0000-4000-8000-000000000001", name: "Laravel & PHP", category: "programming", proficiency: NEUTRAL_PROFICIENCY, icon_name: null, display_order: 1 },
+  { id: "a1000000-0000-4000-8000-000000000002", name: "Godot & GDScript", category: "game_dev", proficiency: NEUTRAL_PROFICIENCY, icon_name: null, display_order: 2 },
+  { id: "a1000000-0000-4000-8000-000000000003", name: "Next.js, React & TypeScript", category: "programming", proficiency: NEUTRAL_PROFICIENCY, icon_name: null, display_order: 3 },
+  { id: "a1000000-0000-4000-8000-000000000004", name: "SQL (SQLite, PostgreSQL)", category: "programming", proficiency: NEUTRAL_PROFICIENCY, icon_name: null, display_order: 4 },
+  { id: "a1000000-0000-4000-8000-000000000005", name: "Linux, Nginx & Cloudflare", category: "programming", proficiency: NEUTRAL_PROFICIENCY, icon_name: null, display_order: 5 },
 ];
 
-export const SEED_MESSAGES: Message[] = [
-  {
-    id: "d4000000-0000-4000-8000-000000000001",
-    sender_name: "Rina Kusuma",
-    sender_email: "rina@techrecruit.io",
-    subject: "Fullstack role — remote",
-    message:
-      "Hi Ardi, we are hiring a senior fullstack engineer for a product team. Your Portfolio CMS work looks close to what we do. Are you open to a chat this week?",
-    is_read: false,
-    created_at: iso(1),
-  },
-  {
-    id: "d4000000-0000-4000-8000-000000000002",
-    sender_name: "Budi Santoso",
-    sender_email: "budi@kopdigital.id",
-    subject: "Game prototype quote",
-    message:
-      "Kami butuh prototipe game edukasi 2D untuk anak SD. Bisa minta estimasi timeline dan biaya untuk scope kecil dulu?",
-    is_read: false,
-    created_at: iso(3),
-  },
-  {
-    id: "d4000000-0000-4000-8000-000000000003",
-    sender_name: "Sarah Lim",
-    sender_email: "sarah@studioform.co",
-    subject: "Design system collaboration",
-    message:
-      "Loved the token architecture write-up on your design system. Would you be open to a paid consultation for our team?",
-    is_read: true,
-    created_at: iso(12),
-  },
-];
+/** The inbox starts empty: there are no demo messages. */
+export const SEED_MESSAGES: Message[] = [];

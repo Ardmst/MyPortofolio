@@ -2,22 +2,17 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AlertCircle, KeyRound, Loader2, LogIn, Mail } from "lucide-react";
+import { KeyRound, Loader2, LogIn, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { isEmail } from "@/lib/utils";
 
-interface LoginFormProps {
-  mode: "supabase" | "local";
-  hintEmail: string;
-}
-
-export function LoginForm({ mode, hintEmail }: LoginFormProps) {
+export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState(mode === "local" ? hintEmail : "");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [submitting, setSubmitting] = useState(false);
@@ -123,18 +118,6 @@ export function LoginForm({ mode, hintEmail }: LoginFormProps) {
           </>
         )}
       </Button>
-
-      {mode === "local" && (
-        <div className="flex items-start gap-2 rounded-lg border border-edge bg-elevated/60 p-3 text-xs leading-relaxed text-fg-subtle">
-          <AlertCircle className="mt-0.5 size-3.5 shrink-0 text-accent" />
-          <span>
-            Supabase env values are still placeholders, so the app is running against the local
-            fallback store. Local credentials: <span className="text-accent-soft">{hintEmail}</span> /
-            the value of <code className="text-accent-soft">LOCAL_ADMIN_PASSWORD</code> in{" "}
-            <code className="text-accent-soft">.env.local</code>.
-          </span>
-        </div>
-      )}
     </form>
   );
 }

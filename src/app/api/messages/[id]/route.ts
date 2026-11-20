@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { RepositoryError, deleteMessage, setMessageRead } from "@/lib/data/repository";
+import { deleteMessage, setMessageRead } from "@/lib/data/repository";
+import { errorResponse } from "@/lib/api";
 import { getAdminUser } from "@/lib/auth/admin";
 import { normalizeIdentifier } from "@/lib/validation";
 
@@ -33,11 +34,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const message = await setMessageRead(identifier, isRead);
     return NextResponse.json({ data: message });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to update the message." },
-      { status },
-    );
+    return errorResponse(error, "Failed to update the message.");
   }
 }
 
@@ -58,10 +55,6 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
     await deleteMessage(identifier);
     return NextResponse.json({ data: { id: identifier } });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to delete the message." },
-      { status },
-    );
+    return errorResponse(error, "Failed to delete the message.");
   }
 }

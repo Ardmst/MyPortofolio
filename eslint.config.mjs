@@ -2,12 +2,20 @@ import coreWebVitals from "eslint-config-next/core-web-vitals";
 
 /**
  * Flat ESLint config. `eslint-config-next` v16 already ships flat configs, so
- * no FlatCompat/@eslint/eslintrc bridge is needed.
+ * no FlatCompat bridge is needed.
  */
 const eslintConfig = [
   ...coreWebVitals,
   {
-    ignores: [".next/**", "node_modules/**", "next-env.d.ts", ".local-data/**"],
+    ignores: [
+      ".next/**",
+      "node_modules/**",
+      "next-env.d.ts",
+      ".local-data/**",
+      ".taste-skill/**",
+      // The Godot web export: generated engine code, served as it is.
+      "public/games/**",
+    ],
   },
 ];
 

@@ -4,6 +4,22 @@ export function isVideoUrl(url: string): boolean {
   return toVideoEmbed(url) !== null;
 }
 
+/**
+ * The image optimizer only fetches from this project's own Supabase bucket
+ * (see next.config.ts). Any other absolute URL an editor pastes is shown as a
+ * plain image instead of being sent through /_next/image, which would reject it.
+ */
+export function skipImageOptimizer(url: string): boolean {
+  if (!/^https?:\/\//i.test(url)) return false;
+
+  try {
+    const allowed = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").hostname;
+    return new URL(url).hostname !== allowed;
+  } catch {
+    return true;
+  }
+}
+
 export interface ProjectFormValues {
   title: string;
   slug: string;
@@ -55,8 +71,9 @@ export function validateProjectForm(values: ProjectFormValues): Record<string, s
     ["github_url", values.github_url],
   ] as const) {
     const trimmed = value.trim();
-    if (trimmed && !/^https?:\/\/.+/i.test(trimmed)) {
-      errors[field] = "Must be a full URL starting with https://";
+    // Same rule as the server (src/lib/validation.ts): a full URL or a path on this site.
+    if (trimmed && !/^https?:\/\/.+/i.test(trimmed) && !trimmed.startsWith("/")) {
+      errors[field] = "Must be a full URL (https://…) or a site-relative path (/…).";
     }
   }
 

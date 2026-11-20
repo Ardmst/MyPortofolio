@@ -1,0 +1,2 @@
+# The Godot web export is served exactly as exported: no end-of-line conversion.
+public/games/** -text

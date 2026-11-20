@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Eye, Loader2, Save, Wand2 } from "lucide-react";
 import { toast } from "sonner";
-import { Markdown } from "@/components/portfolio/markdown";
+import { Markdown } from "@/components/admin/markdown";
 import { MediaManager } from "@/components/admin/media-manager";
 import { TechStackInput } from "@/components/admin/tech-stack-input";
 import { Badge } from "@/components/ui/badge";

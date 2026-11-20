@@ -29,7 +29,7 @@ export function AdminSidebar({ email, mode }: AdminSidebarProps) {
         </span>
         <div className="min-w-0">
           <p className="font-mono text-xs font-semibold text-fg">
-            &gt;_ ardmst<span className="text-accent">.dev</span>
+            &gt;_ ardmst<span className="text-accent">.my.id</span>
           </p>
           <p className="font-mono text-[0.65rem] uppercase tracking-wider text-accent-soft">
             admin cms

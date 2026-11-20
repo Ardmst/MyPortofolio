@@ -68,6 +68,8 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       "Content-Length": String(stat.size),
       "Cache-Control": "public, max-age=31536000, immutable",
       "X-Content-Type-Options": "nosniff",
+      // An uploaded SVG opened directly must not be able to run script on this origin.
+      "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; sandbox",
     },
   });
 }

@@ -1,7 +1,11 @@
 /**
- * Authenticated end-to-end check of the admin CMS.
- * Requires a running server and the local fallback credentials (or real
- * Supabase credentials) from .env.local.
+ * Authenticated end-to-end check of the admin CMS. It creates, edits and
+ * deletes its own test rows, so run it against a local server only.
+ *
+ * The built-in credentials below exist in development only (`next dev`). A
+ * production build has none: start it with LOCAL_ADMIN_EMAIL,
+ * LOCAL_ADMIN_PASSWORD and AUTH_SECRET set, and pass the same e-mail and
+ * password to this script through the environment.
  *
  * Usage: node scripts/verify-admin.mjs [baseUrl]
  */
@@ -74,7 +78,7 @@ console.log("AUTHENTICATION");
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
-  check("valid credentials accepted (200)", good.response.status === 200, `mode=${good.body.mode}`);
+  check("valid credentials accepted (200)", good.response.status === 200);
   check("session cookie issued", cookie.startsWith("pt_admin_session="));
 }
 
@@ -113,8 +117,8 @@ let projectSlug = "";
       description_markdown:
         "## Smoke test\nThis row is created, updated and deleted by the verification script.",
       tech_stack: ["Next.js", "Supabase"],
-      thumbnail_url: "/placeholders/portfolio-cms.svg",
-      gallery_urls: ["/placeholders/portfolio-cms.svg"],
+      thumbnail_url: "/work/kicauscore/scoreboard-live.webp",
+      gallery_urls: ["/work/kicauscore/scoreboard-live.webp"],
       demo_url: "https://example.com",
       github_url: null,
       featured: false,
@@ -135,7 +139,7 @@ let projectSlug = "";
       summary: "Should be rejected because the slug is already taken.",
       description_markdown: "## Duplicate slug test row for the repository layer.",
       tech_stack: ["Next.js"],
-      thumbnail_url: "/placeholders/portfolio-cms.svg",
+      thumbnail_url: "/work/kicauscore/scoreboard-live.webp",
     }),
   });
   check("duplicate slug rejected (409)", duplicate.response.status === 409, duplicate.body.error ?? "");
@@ -163,7 +167,7 @@ let projectSlug = "";
       description_markdown:
         "## Smoke test\nThis row was updated, then deleted, by scripts/verify-admin.mjs.",
       tech_stack: ["Next.js", "Figma"],
-      thumbnail_url: "/placeholders/design-system.svg",
+      thumbnail_url: "/work/kicauscore/home.webp",
       gallery_urls: [],
       demo_url: null,
       github_url: null,

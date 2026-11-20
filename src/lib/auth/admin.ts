@@ -1,23 +1,26 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { isSupabaseConfigured, localAdminEmail, localAdminPassword } from "@/lib/env";
+import { dataMode, localAdminCredentials, signedCookieEnabled } from "@/lib/env";
 import {
   SESSION_COOKIE,
   SESSION_MAX_AGE_SECONDS,
   createSessionToken,
-  verifySessionToken,
+  readSessionCookie,
   type SessionProvider,
 } from "@/lib/auth/session";
 
 /**
  * Admin authentication.
  *
- * Two backends feed ONE gate:
- *  - Supabase Auth, when the project env values are real.
- *  - the local fallback, compared against LOCAL_ADMIN_EMAIL/PASSWORD.
- *
- * Either way the result is mirrored into the signed session cookie so the
- * Edge middleware has a single, uniform thing to check.
+ * Two backends, one gate:
+ *  - Supabase Auth, when the project env values are real. The Supabase session
+ *    is then the only credential; the signed cookie is ignored unless
+ *    AUTH_COOKIE_FALLBACK=true.
+ *  - the local sign-in, compared against LOCAL_ADMIN_EMAIL/PASSWORD and carried
+ *    by the signed session cookie. In production it is refused outright until
+ *    LOCAL_ADMIN_EMAIL, LOCAL_ADMIN_PASSWORD and AUTH_SECRET are set to real
+ *    values (see `src/lib/env.ts`).
  */
 
 export interface AdminUser {
@@ -27,11 +30,16 @@ export interface AdminUser {
   name?: string;
 }
 
+export type SignInResult =
+  | { ok: true }
+  | { ok: false; reason: "invalid" | "unconfigured" | "unavailable" };
+
 /** Resolves the signed-in admin, or null. Safe to call from a Server Component. */
 export async function getAdminUser(): Promise<AdminUser | null> {
   const cookieStore = await cookies();
+  const mode = dataMode();
 
-  if (isSupabaseConfigured()) {
+  if (mode === "supabase") {
     try {
       const supabase = await createServerSupabaseClient();
       // getUser() revalidates the JWT with Supabase — never trust getSession().
@@ -41,11 +49,11 @@ export async function getAdminUser(): Promise<AdminUser | null> {
         return withName({ email, provider: "supabase" }, data.user?.user_metadata);
       }
     } catch {
-      // Fall through to the signed cookie below.
+      // Fall through: the signed cookie only counts when explicitly enabled.
     }
   }
 
-  const session = await verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
+  const session = await readSessionCookie(cookieStore.get(SESSION_COOKIE)?.value, mode);
   if (!session) return null;
 
   return {
@@ -55,14 +63,18 @@ export async function getAdminUser(): Promise<AdminUser | null> {
   };
 }
 
-/** Verifies credentials and, on success, mints the signed session cookie. */
-export async function signInAdmin(
-  email: string,
-  password: string,
-): Promise<{ ok: boolean; error?: string }> {
+/** Constant-time string comparison (length differences are hidden by hashing). */
+function safeEqual(left: string, right: string): boolean {
+  const a = createHash("sha256").update(left, "utf8").digest();
+  const b = createHash("sha256").update(right, "utf8").digest();
+  return timingSafeEqual(a, b);
+}
+
+/** Verifies credentials and, on success, establishes the session. */
+export async function signInAdmin(email: string, password: string): Promise<SignInResult> {
   const normalizedEmail = email.toLowerCase().trim();
 
-  if (isSupabaseConfigured()) {
+  if (dataMode() === "supabase") {
     try {
       const supabase = await createServerSupabaseClient();
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -70,31 +82,40 @@ export async function signInAdmin(
         password,
       });
 
-      if (error || !data.user) {
-        return { ok: false, error: error?.message ?? "Invalid email or password." };
-      }
+      if (error || !data.user) return { ok: false, reason: "invalid" };
 
-      await setSessionCookie(withName({ email: data.user.email ?? normalizedEmail }, data.user.user_metadata));
+      // The Supabase cookies are the session. Mirror it into the signed cookie
+      // only when the fallback has been switched on explicitly.
+      if (signedCookieEnabled("supabase")) {
+        await setSessionCookie(
+          withName({ email: data.user.email ?? normalizedEmail }, data.user.user_metadata),
+        );
+      }
       return { ok: true };
     } catch (error) {
-      return {
-        ok: false,
-        error: error instanceof Error ? error.message : "Supabase sign-in failed.",
-      };
+      console.error("[auth] Supabase sign-in failed:", error);
+      return { ok: false, reason: "unavailable" };
     }
   }
 
-  if (normalizedEmail !== localAdminEmail.toLowerCase().trim() || password !== localAdminPassword) {
-    return { ok: false, error: "Invalid email or password." };
+  const credentials = localAdminCredentials();
+  if (!credentials || !signedCookieEnabled("local")) {
+    // Production without real LOCAL_ADMIN_* / AUTH_SECRET values: no sign-in.
+    return { ok: false, reason: "unconfigured" };
   }
 
-  await setSessionCookie({ email: normalizedEmail, provider: "local" });
+  // Evaluate both comparisons so timing does not reveal which one failed.
+  const emailMatches = safeEqual(normalizedEmail, credentials.email);
+  const passwordMatches = safeEqual(password, credentials.password);
+  if (!emailMatches || !passwordMatches) return { ok: false, reason: "invalid" };
+
+  await setSessionCookie({ email: credentials.email, provider: "local" });
   return { ok: true };
 }
 
 /** Clears both the Supabase session and the signed cookie. */
 export async function signOutAdmin(): Promise<void> {
-  if (isSupabaseConfigured()) {
+  if (dataMode() === "supabase") {
     try {
       const supabase = await createServerSupabaseClient();
       await supabase.auth.signOut();

@@ -1,12 +1,28 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { RepositoryError, createMessage, listMessages } from "@/lib/data/repository";
+import { createMessage, listMessages } from "@/lib/data/repository";
+import { errorResponse } from "@/lib/api";
 import { getAdminUser } from "@/lib/auth/admin";
+import { RateLimiter, clientAddress } from "@/lib/rate-limit";
 import { validateMessage } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
+/** Messages one client address may send inside ten minutes. */
+const perClient = new RateLimiter(5, 10 * 60 * 1000);
+/** Messages accepted in total inside one hour, whatever the address. */
+const overall = new RateLimiter(60, 60 * 60 * 1000, 1);
+
 /** POST /api/messages — public contact form submission. */
 export async function POST(request: NextRequest) {
+  const client = clientAddress(request);
+  const blockedFor = Math.max(perClient.retryAfter(client), overall.retryAfter("all"));
+  if (blockedFor > 0) {
+    return NextResponse.json(
+      { error: "Too many messages. Try again later." },
+      { status: 429, headers: { "Retry-After": String(blockedFor) } },
+    );
+  }
+
   let payload: unknown;
   try {
     payload = await request.json();
@@ -19,15 +35,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Validation failed.", errors: validated.errors }, { status: 422 });
   }
 
+  perClient.hit(client);
+  overall.hit("all");
+
   try {
     const message = await createMessage(validated.value);
     return NextResponse.json({ data: { id: message.id, created_at: message.created_at } }, { status: 201 });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to send the message." },
-      { status },
-    );
+    return errorResponse(error, "Failed to send the message.");
   }
 }
 
@@ -46,10 +61,6 @@ export async function GET() {
       unread: messages.filter((message) => !message.is_read).length,
     });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to load messages." },
-      { status },
-    );
+    return errorResponse(error, "Failed to load messages.");
   }
 }

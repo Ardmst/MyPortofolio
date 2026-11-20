@@ -1,15 +1,15 @@
-import { promises as fs } from "node:fs";
-import path from "node:path";
+import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createServiceRoleClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { bucket, dataMode } from "@/lib/env";
+import { RepositoryError } from "@/lib/data/errors";
 import {
-  LOCAL_UPLOAD_DIR,
   LOCAL_UPLOAD_URL_PREFIX,
   newId,
   readOnly,
   withDatabase,
+  writeLocalUpload,
 } from "@/lib/data/local-store";
 import type {
   DashboardStats,
@@ -21,7 +21,7 @@ import type {
   Skill,
   SkillInput,
 } from "@/lib/types";
-import { countUnread } from "@/lib/utils";
+import { countUnread, isUuid } from "@/lib/utils";
 
 /**
  * Single data-access layer for the whole app.
@@ -30,31 +30,39 @@ import { countUnread } from "@/lib/utils";
  * file store, depending on `dataMode()`. Callers never need to know which.
  */
 
-export class RepositoryError extends Error {
-  status: number;
+export { RepositoryError };
 
-  constructor(message: string, status = 500) {
-    super(message);
-    this.name = "RepositoryError";
-    this.status = status;
-  }
-}
-
+/**
+ * Turns any backend failure into a RepositoryError whose message is safe to
+ * show. Known Supabase/Postgres mistakes get an actionable sentence; anything
+ * else gets the caller's generic fallback. The raw error only reaches the
+ * server log, never a response.
+ */
 function fail(error: unknown, fallback: string): never {
+  if (error instanceof RepositoryError) throw error;
+
   const message =
     error && typeof error === "object" && "message" in error
       ? String((error as { message: unknown }).message)
-      : fallback;
+      : "";
 
-  // Surface the common Supabase/Postgres mistakes as actionable messages.
+  const code =
+    error && typeof error === "object" && "code" in error
+      ? String((error as { code: unknown }).code)
+      : "";
+
   if (message.includes("duplicate key") && message.includes("slug")) {
     throw new RepositoryError("A project with that slug already exists.", 409);
   }
+  // PostgREST: `.single()` matched no row.
+  if (code === "PGRST116") {
+    throw new RepositoryError("Not found.", 404);
+  }
+
+  console.error(`[repository] ${fallback}`, error);
+
   if (message.includes("Bucket not found")) {
-    throw new RepositoryError(
-      `Storage bucket "${bucket}" was not found. Run supabase/storage.sql first.`,
-      500,
-    );
+    throw new RepositoryError("The storage bucket is missing. Run supabase/storage.sql first.", 500);
   }
   if (message.includes("relation") && message.includes("does not exist")) {
     throw new RepositoryError(
@@ -63,7 +71,7 @@ function fail(error: unknown, fallback: string): never {
     );
   }
 
-  throw new RepositoryError(message || fallback, 500);
+  throw new RepositoryError(fallback, 500);
 }
 
 /**
@@ -80,6 +88,20 @@ async function db(): Promise<SupabaseClient> {
 /* -------------------------------------------------------------------------- */
 /* Projects                                                                    */
 /* -------------------------------------------------------------------------- */
+
+/**
+ * PostgREST filter that finds a project by slug or id. The id column is a
+ * uuid, so the id branch is only added when the key really is one — comparing
+ * a slug against it would make Postgres reject the whole query.
+ */
+function projectFilter(key: string): string {
+  return isUuid(key) ? `slug.eq.${key},id.eq.${key}` : `slug.eq.${key}`;
+}
+
+/** Slugs and ids are plain `a-z 0-9 -`; anything else cannot match a row. */
+function isProjectKey(key: string): boolean {
+  return /^[a-z0-9-]{1,255}$/i.test(key);
+}
 
 function sortProjects(projects: Project[]): Project[] {
   return [...projects].sort((a, b) => {
@@ -118,7 +140,7 @@ export async function listProjects(options?: {
 
 export async function getProject(slugOrId: string): Promise<Project | null> {
   const key = slugOrId.trim();
-  if (!key) return null;
+  if (!isProjectKey(key)) return null;
 
   if (dataMode() === "local") {
     return readOnly(
@@ -131,7 +153,7 @@ export async function getProject(slugOrId: string): Promise<Project | null> {
     const { data, error } = await supabase
       .from("projects")
       .select("*")
-      .or(`slug.eq.${key},id.eq.${key}`)
+      .or(projectFilter(key))
       .maybeSingle();
 
     if (error) throw error;
@@ -191,6 +213,7 @@ export async function createProject(input: ProjectInput): Promise<Project> {
 export async function updateProject(slugOrId: string, input: ProjectInput): Promise<Project> {
   const payload = normalizeProject(input);
   const key = slugOrId.trim();
+  if (!isProjectKey(key)) throw new RepositoryError("Project not found.", 404);
 
   if (dataMode() === "local") {
     return withDatabase((store) => {
@@ -218,7 +241,7 @@ export async function updateProject(slugOrId: string, input: ProjectInput): Prom
     const { data, error } = await supabase
       .from("projects")
       .update(payload)
-      .or(`slug.eq.${key},id.eq.${key}`)
+      .or(projectFilter(key))
       .select("*")
       .single();
 
@@ -231,6 +254,7 @@ export async function updateProject(slugOrId: string, input: ProjectInput): Prom
 
 export async function deleteProject(slugOrId: string): Promise<{ id: string; title: string }> {
   const key = slugOrId.trim();
+  if (!isProjectKey(key)) throw new RepositoryError("Project not found.", 404);
 
   if (dataMode() === "local") {
     return withDatabase((store) => {
@@ -249,7 +273,7 @@ export async function deleteProject(slugOrId: string): Promise<{ id: string; tit
     const { data, error } = await supabase
       .from("projects")
       .delete()
-      .or(`slug.eq.${key},id.eq.${key}`)
+      .or(projectFilter(key))
       .select("id, title")
       .single();
 
@@ -482,7 +506,7 @@ const ALLOWED_TYPES = [...IMAGE_TYPES, ...VIDEO_TYPES];
 
 /**
  * Uploads a media file and returns its public URL.
- * Supabase mode → Storage bucket. Local mode → `public/uploads`.
+ * Supabase mode → Storage bucket. Local mode → `.local-data/uploads`.
  */
 export async function uploadMedia(file: File): Promise<{ url: string; path: string }> {
   if (!file || file.size === 0) {
@@ -504,9 +528,7 @@ export async function uploadMedia(file: File): Promise<{ url: string; path: stri
   const objectPath = `${new Date().toISOString().slice(0, 10)}/${Date.now()}-${safeName}`;
 
   if (dataMode() === "local") {
-    const target = path.join(LOCAL_UPLOAD_DIR, objectPath);
-    await fs.mkdir(path.dirname(target), { recursive: true });
-    await fs.writeFile(target, Buffer.from(await file.arrayBuffer()));
+    await writeLocalUpload(objectPath, new Uint8Array(await file.arrayBuffer()));
     return { url: `${LOCAL_UPLOAD_URL_PREFIX}/${objectPath}`, path: objectPath };
   }
 

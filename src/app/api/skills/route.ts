@@ -1,22 +1,34 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
-import { RepositoryError, createSkill, listSkills } from "@/lib/data/repository";
+import { createSkill, listSkills } from "@/lib/data/repository";
+import { errorResponse } from "@/lib/api";
 import { getAdminUser } from "@/lib/auth/admin";
 import { validateSkill } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
-/** GET /api/skills — public listing that backs the skill matrix. */
+/**
+ * GET /api/skills — the toolbox.
+ *
+ * The schema carries a proficiency number, but it is a neutral placeholder and
+ * is never shown publicly: only a signed-in admin (the CMS) receives it.
+ */
 export async function GET() {
   try {
     const skills = await listSkills();
-    return NextResponse.json({ data: skills, count: skills.length });
+    const admin = await getAdminUser();
+    const data = admin
+      ? skills
+      : skills.map(({ id, name, category, icon_name, display_order }) => ({
+          id,
+          name,
+          category,
+          icon_name,
+          display_order,
+        }));
+    return NextResponse.json({ data, count: data.length });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to load skills." },
-      { status },
-    );
+    return errorResponse(error, "Failed to load skills.");
   }
 }
 
@@ -45,10 +57,6 @@ export async function POST(request: NextRequest) {
     revalidatePath("/");
     return NextResponse.json({ data: skill }, { status: 201 });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to create the skill." },
-      { status },
-    );
+    return errorResponse(error, "Failed to create the skill.");
   }
 }

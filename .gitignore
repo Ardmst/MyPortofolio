@@ -30,3 +30,6 @@ yarn-error.log*
 
 # scratch: local image-variant previews
 /.preview/
+
+# design-skill working files (screenshots, inspector output)
+/.taste-skill/

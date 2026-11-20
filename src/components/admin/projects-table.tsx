@@ -33,6 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { skipImageOptimizer } from "@/lib/admin-utils";
 import { GALLERY_FILTERS, PROJECT_CATEGORY_LABELS, type GalleryFilter } from "@/lib/constants";
 import type { Project } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
@@ -172,6 +173,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
                         fill
                         sizes="44px"
                         className="object-cover grayscale-[0.6]"
+                        unoptimized={skipImageOptimizer(project.thumbnail_url)}
                       />
                     </div>
                   </TableCell>

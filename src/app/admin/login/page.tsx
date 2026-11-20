@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { ArrowLeft, ShieldCheck, Terminal } from "lucide-react";
 import { LoginForm } from "@/components/admin/login-form";
 import { Badge } from "@/components/ui/badge";
-import { dataMode, localAdminEmail } from "@/lib/env";
+import { dataMode } from "@/lib/env";
 import { SITE } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -42,7 +42,7 @@ export default function AdminLoginPage() {
               <div>
                 <p className="font-mono text-sm text-fg">
                   {SITE.name.toLowerCase()}
-                  <span className="text-accent">.dev</span>
+                  <span className="text-accent">.my.id</span>
                 </p>
                 <p className="font-mono text-[0.65rem] uppercase tracking-wider text-fg-subtle">
                   admin cms
@@ -68,7 +68,7 @@ export default function AdminLoginPage() {
           <Suspense
             fallback={<div className="h-64 animate-pulse rounded-lg border border-edge bg-elevated/40" />}
           >
-            <LoginForm mode={mode} hintEmail={localAdminEmail} />
+            <LoginForm />
           </Suspense>
         </div>
 

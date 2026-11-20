@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { RepositoryError, createProject, listProjects } from "@/lib/data/repository";
+import { revalidatePath } from "next/cache";
+import { createProject, listProjects } from "@/lib/data/repository";
+import { errorResponse } from "@/lib/api";
 import { getAdminUser } from "@/lib/auth/admin";
 import { PROJECT_CATEGORIES, type ProjectCategory } from "@/lib/types";
 import { validateProject } from "@/lib/validation";
@@ -18,11 +20,7 @@ export async function GET(request: NextRequest) {
     const projects = await listProjects({ category });
     return NextResponse.json({ data: projects, count: projects.length, category });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to load projects." },
-      { status },
-    );
+    return errorResponse(error, "Failed to load projects.");
   }
 }
 
@@ -47,12 +45,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const project = await createProject(validated.value);
+    // The public home page is static: refresh it when the content changes.
+    revalidatePath("/");
     return NextResponse.json({ data: project }, { status: 201 });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to create the project." },
-      { status },
-    );
+    return errorResponse(error, "Failed to create the project.");
   }
 }

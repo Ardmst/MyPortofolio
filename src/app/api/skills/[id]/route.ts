@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
-import { RepositoryError, deleteSkill, updateSkill } from "@/lib/data/repository";
+import { deleteSkill, updateSkill } from "@/lib/data/repository";
+import { errorResponse } from "@/lib/api";
 import { getAdminUser } from "@/lib/auth/admin";
 import { normalizeIdentifier, validateSkill } from "@/lib/validation";
 
@@ -38,11 +39,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     revalidatePath("/");
     return NextResponse.json({ data: skill });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to update the skill." },
-      { status },
-    );
+    return errorResponse(error, "Failed to update the skill.");
   }
 }
 
@@ -64,10 +61,6 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
     revalidatePath("/");
     return NextResponse.json({ data: { id: identifier } });
   } catch (error) {
-    const status = error instanceof RepositoryError ? error.status : 500;
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to delete the skill." },
-      { status },
-    );
+    return errorResponse(error, "Failed to delete the skill.");
   }
 }

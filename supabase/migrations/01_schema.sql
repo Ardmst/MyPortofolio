@@ -5,6 +5,7 @@
 --
 -- Run with:  supabase db push
 --        or: paste into the Supabase SQL editor.
+-- Idempotent: every statement is "if not exists" / "or replace" / drop-then-create.
 -- ===========================================================================
 
 create extension if not exists "pgcrypto";
@@ -71,12 +72,11 @@ create table if not exists public.site_settings (
   updated_at timestamptz not null default now()
 );
 
-create trigger site_settings_touch_updated_at
-  before update on public.site_settings
-  for each row execute function public.touch_updated_at();
-
 -- ---------------------------------------------------------------------------
 -- updated_at maintenance
+--
+-- The function is defined before the triggers that call it, and every trigger
+-- is dropped first, so this file can be run again on an existing database.
 -- ---------------------------------------------------------------------------
 create or replace function public.touch_updated_at()
 returns trigger
@@ -91,6 +91,11 @@ $$;
 drop trigger if exists projects_touch_updated_at on public.projects;
 create trigger projects_touch_updated_at
   before update on public.projects
+  for each row execute function public.touch_updated_at();
+
+drop trigger if exists site_settings_touch_updated_at on public.site_settings;
+create trigger site_settings_touch_updated_at
+  before update on public.site_settings
   for each row execute function public.touch_updated_at();
 
 -- ---------------------------------------------------------------------------
