@@ -5,7 +5,7 @@ import { siteUrl } from "@/lib/env";
  * Public, indexable pages, as paths. Add a page here when it gets a route
  * under `src/app/(site)/` (for example "/play/detektif").
  */
-const PUBLIC_PATHS = ["/"] as const;
+const PUBLIC_PATHS = ["/", "/play/detektif"] as const;
 
 /** /sitemap.xml */
 export default function sitemap(): MetadataRoute.Sitemap {

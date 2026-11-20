@@ -1,4 +1,582 @@
 /*
  * portofolio.ardmst.my.id — rules that belong to this site only.
- * Loaded after theme.css (a verbatim copy of the shared theme; never edit that copy).
+ * Loaded after theme.css and sheet-kit.css (verbatim copies of the shared files; never edit those copies).
+ *
+ * Conventions
+ *  - Colours, type sizes, spacing and easing come from theme.css tokens. The few tokens this
+ *    site adds are in the first block below; nothing else in this file holds a raw value.
+ *  - One block per component, BEM-like: .hero / .work / .project / .stage / .shot /
+ *    .standings / .play, then the placeholders (.rest) the second half of the page still stands on.
+ *  - No section sets a background of the page ground: the dot sheet shows wherever there is none.
+ *  - Wide layout from 900px. Below that every section has a phone composition of its own.
+ *  - Motion: transform, opacity and clip-path only; entrances are `data-rise` (theme.css + the kit),
+ *    the hero's first screen arrives with CSS alone so it never waits for script.
  */
+
+/* ---- site tokens ----------------------------------------------------------------------------------- */
+
+:root {
+  /* Ink on the dark per-project fields (forest, kicau, ember). The same in both themes. */
+  --on-field: #ffffff;
+
+  /* The bar's height: its padding and its one line, as theme.css sets them on .bar. */
+  --bar-h: calc(2 * clamp(0.9rem, 1.6vw, 1.5rem) + 1.2 * var(--step-body));
+
+  /*
+   * The hero. Its monument is sized by the width (ARDMST is 2.27em wide, so 40vw fills
+   * the measure) and capped by the height, because it is pinned and shares the screen with
+   * the portraits. In Bebas Neue with line-height 0.8 the capitals take the top 0.7em of the
+   * line box; the band ends 0.04em under their feet.
+   */
+  --hero-f: min(40vw, 61vh);
+  --hero-air: 0.75rem;                                          /* above the letters while pinned */
+  --hero-band: calc(var(--bar-h) + var(--hero-f) * 0.74);       /* the band at rest: bar + name */
+  --hero-lintel: calc(var(--hero-air) + var(--hero-f) * 0.74);  /* its lower edge once pinned */
+  --hero-leaf: min(100vh - var(--hero-band), 74vh);             /* the first sheet: the rest of the first screen */
+  --hero-sheet: min(100vh - var(--hero-lintel), 74vh);          /* every later sheet: all the room under the pinned band */
+  --hero-pad: clamp(0.5rem, 1vw, 0.875rem);
+  --hero-cap: calc(var(--step-small) * 1.4 + 0.6rem);           /* a caption line and its gap */
+  --hero-say: 12.5rem;                                          /* sentence + button above the first portrait on narrow screens */
+}
+
+@supports (height: 1svh) {
+  :root {
+    --hero-f: min(40vw, 61svh);
+    --hero-leaf: min(100svh - var(--hero-band), 74svh);
+    --hero-sheet: min(100svh - var(--hero-lintel), 74svh);
+  }
+}
+
+/* ---- small things ---------------------------------------------------------------------------------- */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* A text link that is a button (Restart). */
+button.link {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Shown only where there is a mouse (and so, very likely, a keyboard) / only where there is not. */
+@media (hover: hover) and (pointer: fine) {
+  .if-touch { display: none !important; }
+}
+@media not all and (hover: hover) and (pointer: fine) {
+  .if-keys { display: none !important; }
+}
+
+/* ---- hero: pinned title over portraits ------------------------------------------------------------- */
+
+.hero { position: relative; }
+
+/* The band the monument stands on. It takes the ground and ink of the sheet that has docked. */
+.hero__band {
+  height: var(--hero-band);
+  padding-top: var(--bar-h);
+  background: var(--hero-ground, transparent);
+  color: var(--hero-ink, inherit);
+  text-align: center;
+}
+.hero__name {
+  font-size: var(--hero-f);
+  padding-right: 0.035em;   /* the last letter's tracking, so the ink is centred */
+}
+
+.hero[data-step="1"] { --hero-ground: var(--g1); --hero-ink: var(--i1); }
+.hero[data-step="2"] { --hero-ground: var(--g2); --hero-ink: var(--i2); }
+.hero[data-step="3"] { --hero-ground: var(--g3); --hero-ink: var(--i3); }
+.hero[data-step="4"] { --hero-ground: var(--g4); --hero-ink: var(--i4); }
+.hero[data-step="5"] { --hero-ground: var(--g5); --hero-ink: var(--i5); }
+.hero[data-step="6"] { --hero-ground: var(--g6); --hero-ink: var(--i6); }
+.hero[data-step="7"] { --hero-ground: var(--g7); --hero-ink: var(--i7); }
+
+/* One sheet: a portrait and its caption on a flat ground. Stacked, unless the hero is pinned (below). */
+.hero__leaf {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  row-gap: 1rem;
+  padding: clamp(2rem, 6vw, 4rem) var(--margin);
+}
+.hero__leaf--first {
+  justify-items: start;
+  padding-top: var(--hero-pad);
+}
+.hero__say { max-width: 30ch; }
+.hero__fig {
+  display: grid;
+  justify-items: center;
+  row-gap: 0.6rem;
+  justify-self: center;
+}
+.hero__pic {
+  width: min(100%, 22rem);
+  aspect-ratio: 2 / 3;
+}
+.hero__cap { text-align: center; }
+
+@media (min-width: 900px) {
+  /* First sheet: the sentence at the left foot, the portrait in the middle, the button at the right foot. */
+  .hero__leaf--first {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    column-gap: var(--gap);
+    align-items: end;
+    justify-items: stretch;
+  }
+  .hero__leaf--first .hero__say {
+    grid-area: 1 / 1;
+    max-width: 26ch;
+    margin-bottom: var(--hero-cap);
+  }
+  .hero__leaf--first .hero__fig { grid-area: 1 / 2; }
+  .hero__leaf--first .hero__go {
+    grid-area: 1 / 3;
+    justify-self: end;
+    margin-bottom: var(--hero-cap);
+  }
+}
+
+/* How tall a sheet is and how tall its portrait may be (used below, wherever a sheet has a set height). */
+.hero__leaf {
+  --hero-h: var(--hero-sheet);
+  --hero-pic: calc(var(--hero-h) - 2 * var(--hero-pad) - var(--hero-cap));
+}
+.hero__leaf--first {
+  --hero-h: var(--hero-leaf);
+  --hero-pic: calc(var(--hero-h) - 2 * var(--hero-pad) - var(--hero-cap) - var(--hero-say));
+}
+@media (min-width: 900px) {
+  .hero__leaf--first { --hero-pic: calc(var(--hero-h) - 2 * var(--hero-pad) - var(--hero-cap)); }
+}
+
+/* The first sheet fills the rest of the first screen in every mode, so the sentence, the button
+   and the whole portrait are there without scrolling, pinned or not. */
+@media (min-height: 560px) {
+  .hero__leaf--first {
+    min-height: var(--hero-h);
+    padding-block: var(--hero-pad);
+    align-content: start;
+  }
+  .hero__leaf--first .hero__pic {
+    width: auto;
+    height: min(var(--hero-pic), calc((100vw - 2 * var(--margin)) * 1.5));
+  }
+}
+
+/*
+ * Pinned. The band sticks under the top edge (the bar scrolls away above it), every sheet sticks
+ * under the band and the next one slides up over it. Script on, full motion, and a screen tall enough.
+ */
+@media (prefers-reduced-motion: no-preference) and (min-height: 560px) {
+  .js .hero { padding-top: var(--hero-band); }
+  /* The band's rail: the whole hero but its last sheet, so band and last sheet release together. */
+  .js .hero__rail {
+    position: absolute;
+    inset: 0 0 var(--hero-sheet) 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .js .hero__band {
+    position: sticky;
+    top: calc(var(--hero-air) - var(--bar-h));
+    pointer-events: auto;
+  }
+  .js .hero__leaf {
+    position: sticky;
+    top: var(--hero-lintel);
+    height: var(--hero-h);
+    padding-block: var(--hero-pad);
+    align-content: start;
+  }
+  .js .hero__leaf[data-under] { visibility: hidden; }   /* fully covered by the sheet above */
+  .js .hero__pic {
+    width: auto;
+    height: min(var(--hero-pic), calc((100vw - 2 * var(--margin)) * 1.5));
+  }
+}
+
+/* The first screen arrives with CSS alone: nothing here waits for script. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero__say,
+  .hero__go,
+  .hero__leaf--first .hero__fig { animation: hero-in 720ms var(--ease) backwards; }
+  .hero__go { animation-delay: 90ms; }
+  .hero__leaf--first .hero__fig { animation-delay: 180ms; }
+  /* the one moving photograph of the first screen: the portrait settles slowly into its frame */
+  .hero__leaf--first .hero__pic img { animation: hero-settle 2400ms var(--ease) backwards; }
+}
+@keyframes hero-in { from { opacity: 0; transform: translateY(20px); } }
+@keyframes hero-settle { from { transform: scale(1.12); } }
+
+/* ---- work: oversized visual, small cluster ----------------------------------------------------------- */
+
+.work {
+  padding-top: calc(var(--section) * 0.75);
+  padding-bottom: calc(var(--section) / 2);
+}
+.work__title {
+  padding-inline: var(--margin);
+  margin-bottom: clamp(2.25rem, 5vw, 4.5rem);
+}
+
+/*
+ * One project: the oversized visual, the small cluster (a 16:10 picture, the title, the kind
+ * line), the description, the facts and the action.
+ *
+ * Narrow (the base): one column. The visual first, running off the left edge; then the title,
+ * the words and the action; the small picture last, at 70% of the width against the right margin.
+ *
+ * Wide (900px and up): twelve columns. The visual runs off the left edge of the screen and the
+ * cluster sits at its foot on the right; under them the description, the facts and the action.
+ * Blocks keep this structure and change their measure in turn (nth-of-type), and each visual
+ * brings its own proportion (--project-ratio, from the data), so the rhythm changes down the page.
+ */
+.project {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 1.1rem;
+  padding-inline: var(--margin);
+}
+.project + .project { margin-top: clamp(5.5rem, 10vw, 8.75rem); }
+
+.project__visual {
+  order: 1;
+  margin-left: calc(-1 * var(--margin) - 2px);   /* off the left edge of the screen */
+}
+.project__cluster { display: contents; }
+.project__title {
+  order: 2;
+  font-size: var(--step-head);
+  margin-top: 0.4rem;
+}
+.project__kind { order: 3; margin-top: -0.5rem; }
+.project__text { order: 4; max-width: 62ch; }
+.project__aside {
+  order: 5;
+  display: grid;
+  row-gap: 1.5rem;
+}
+.project__actions {
+  order: 6;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+}
+.project__cluster > :first-child {
+  order: 7;
+  width: 70%;
+  justify-self: end;
+  margin-top: 0.75rem;
+}
+
+.project__tall { display: none; }
+.project__flush { aspect-ratio: var(--project-ratio, 16 / 9); }
+.project__small { aspect-ratio: 16 / 10; }
+.project__cap {
+  margin-top: 0.6rem;
+  padding-left: calc(var(--margin) + 2px);   /* back on the page margin, under a visual that bleeds */
+  color: var(--muted);
+}
+
+/* On one column a small caption would sit straight above the title and read as a label over it:
+   there the pictures keep their captions for screen readers only. The game's note comes back as
+   soon as the game is started, because then it carries the controls and Restart. */
+@media (max-width: 899px) {
+  .project__visual figcaption,
+  .project__visual .stage:not([data-running]) + .stage__note {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .project__visual .stage__note { margin-bottom: 0.4rem; }
+}
+
+/* Narrow touch screens show the upright picture instead of the wide one (and no game). */
+@media (max-width: 899px) and (hover: none), (max-width: 899px) and (pointer: coarse) {
+  .project__wide { display: none; }
+  .project__tall { display: block; }
+  .project__tall .project__flush { aspect-ratio: 4 / 5; }
+}
+
+@media (min-width: 900px) {
+  .project {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gap);
+    row-gap: clamp(1.75rem, 3vw, 3rem);
+    align-items: start;
+  }
+  .project__visual { grid-column: 1 / span 8; grid-row: 1; }
+  .project__cluster {
+    display: block;
+    grid-column: 9 / -1;
+    grid-row: 1;
+    align-self: end;
+    padding-left: var(--gap);
+  }
+  .project__cluster > :first-child {
+    width: auto;
+    justify-self: auto;
+    margin-top: 0;
+  }
+  .project__title { margin-top: clamp(1.1rem, 2vw, 1.75rem); }
+  .project__kind { margin-top: 0.7rem; }
+  .project__text { grid-column: 1 / span 5; grid-row: 2; }
+  .project__aside { grid-column: 6 / span 3; grid-row: 2; }
+  .project__actions {
+    grid-column: 9 / -1;
+    grid-row: 2;
+    padding-left: var(--gap);
+  }
+
+  .project:nth-of-type(3n + 2) .project__visual { grid-column: 1 / span 7; }
+  .project:nth-of-type(3n + 2) .project__text { grid-column: 1 / span 4; }
+  .project:nth-of-type(3n + 2) .project__aside { grid-column: 5 / span 3; }
+}
+
+/* ---- the game stage ---------------------------------------------------------------------------------- */
+
+.stage__box {
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  background: var(--field, var(--surface));
+}
+button.stage__still { cursor: pointer; }
+button.stage__still:focus-visible { outline-offset: -6px; }
+.stage__clip,
+.stage__still > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  button.stage__still:hover > * { transform: scale(1.025); }
+}
+button.stage__still:active > * { transform: scale(1.01); transition-duration: var(--dur-fast); }
+.stage__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.stage__note {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+  color: var(--muted);
+}
+.stage__controls {
+  display: flex;
+  flex: none;
+  gap: 1.25rem;
+}
+
+/* ---- an interface capture on the project's colour field ---------------------------------------------- */
+
+/* The capture hangs from the page margin and a little below the top of the field, larger than the
+   field can hold: the right and bottom edges of the field crop it. */
+.shot {
+  position: relative;
+  aspect-ratio: var(--project-ratio, 5 / 4);
+  overflow: hidden;
+}
+.shot > img {
+  position: absolute;
+  top: clamp(1.5rem, 3.6vw, 3.25rem);
+  left: calc(var(--margin) + 2px);
+  width: 128%;
+  max-width: none;
+  height: auto;
+}
+.shot--tall { aspect-ratio: 4 / 5; }
+.shot--tall > img { width: 84%; }
+/* the small picture of the cluster, when it is a capture too: on its own pale field, page margin not needed */
+.shot--small { aspect-ratio: 16 / 10; }
+.shot--small > img {
+  top: clamp(0.75rem, 1.4vw, 1.25rem);
+  left: clamp(0.75rem, 1.4vw, 1.25rem);
+  width: max(124%, 28rem);
+}
+
+/* ---- the live standings: a real interface fragment (data-ui) ----------------------------------------- */
+
+.standings {
+  background: var(--field-mint);
+  color: var(--field-kicau);
+  padding: 0.9rem 1rem 0.8rem;
+  font-size: var(--step-small);
+  line-height: 1.35;
+}
+.standings table { width: 100%; }
+.standings caption {
+  padding-bottom: 0.45rem;
+  font-size: var(--step-body);
+  font-weight: 600;
+  text-align: left;
+}
+.standings th,
+.standings td {
+  padding: 0.38rem 0.6rem 0.38rem 0;
+  text-align: left;
+  vertical-align: top;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.standings th { font-weight: 500; }
+.standings td { border-top: 1px solid color-mix(in srgb, var(--field-kicau) 20%, transparent); }
+.standings th:last-child,
+.standings td:last-child { padding-right: 0; }
+.standings .standings__num { text-align: right; }
+.standings__owner { display: block; opacity: 0.78; }
+.standings figcaption { margin-top: 0.55rem; }
+
+/* ---- /play/detektif ---------------------------------------------------------------------------------- */
+
+.play {
+  padding: calc(var(--bar-h) + clamp(1.25rem, 3.5vw, 3rem)) var(--margin) calc(var(--section) / 2);
+}
+.play__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem var(--gap);
+  margin-bottom: clamp(1rem, 2vw, 1.75rem);
+}
+.play__kind { margin-top: 0.5rem; }
+/* As large as the page allows, and never taller than the screen. */
+.play__stage { width: min(100%, calc((100vh - 5rem) * 16 / 9)); }
+@supports (height: 1svh) {
+  .play__stage { width: min(100%, calc((100svh - 5rem) * 16 / 9)); }
+}
+.play__stage .stage__note { margin-top: 0.6rem; }
+.play__touch { margin-top: 0.75rem; }
+
+.play__notes,
+.play__stills {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  row-gap: 2.5rem;
+  margin-top: clamp(3rem, 7vw, 6rem);
+}
+.play__notes > section:nth-of-type(1) { grid-column: 1 / span 6; }
+.play__notes > section:nth-of-type(2) { grid-column: 7 / -1; }
+.play__notes h2 { margin-bottom: 0.9rem; }
+.play__keys > div {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  column-gap: var(--gap);
+  padding-block: 0.3rem;
+}
+.play__keys dt { color: var(--muted); }
+.play__list { max-width: 46ch; }
+.play__list > li + li { margin-top: 0.5rem; }
+
+.play__stills { row-gap: 1.25rem; }
+.play__stills > h2 { grid-column: 1 / -1; }
+.play__stills > figure { grid-column: span 4; }
+.play__still { aspect-ratio: 16 / 9; }
+.play__stills figcaption { margin-top: 0.6rem; }
+.play__back { margin-top: clamp(2.5rem, 5vw, 4rem); }
+
+@media (max-width: 899px) {
+  .play__notes > section:nth-of-type(n),
+  .play__stills > figure { grid-column: 1 / -1; }
+}
+
+/* ---- placeholders: about, list, contact, close --------------------------------------------------------
+ * Plain layout for the second half of the page, so it reads and works today. Not designed:
+ * stage B replaces these rules (and src/components/site/Rest.tsx) section by section.
+ */
+
+.rest {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  row-gap: 2rem;
+  padding: calc(var(--section) / 2) var(--margin);
+}
+.rest__label { margin-bottom: 1rem; }
+.rest__side { grid-column: 1 / span 3; }
+.rest__main {
+  grid-column: 4 / -1;
+  display: grid;
+  row-gap: 1.2em;
+}
+.rest__facts > div + div { margin-top: 0.75rem; }
+.rest__table {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+.rest__table caption { text-align: left; }
+.rest__table th,
+.rest__table td {
+  padding: 0.35rem var(--gap) 0.35rem 0;
+  font-weight: 400;
+  text-align: left;
+  vertical-align: top;
+}
+.rest__table th { width: 28%; }
+.rest--contact {
+  display: block;
+  padding-inline: 0;
+}
+.rest__greeting { padding: 0 var(--margin) 1.5rem; }
+.rest__close {
+  display: grid;
+  justify-items: start;
+  row-gap: 1.5rem;
+  padding-inline: var(--margin);
+}
+.rest__invite {
+  max-width: 14em;
+  font-size: var(--step-head);
+}
+.rest__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+.rest__derivation {
+  padding: 0 var(--margin) 0.75rem;
+  font-size: var(--step-lead);
+}
+.rest__dropped { color: var(--field-1-soft); }
+
+@media (max-width: 899px) {
+  .rest__side,
+  .rest__main { grid-column: 1 / -1; }
+}
+@media (max-width: 599px) {
+  .rest__table,
+  .rest__table caption,
+  .rest__table tbody,
+  .rest__table tr,
+  .rest__table th,
+  .rest__table td { display: block; width: auto; }
+  .rest__table tr + tr { margin-top: 1rem; }
+  .rest__table th,
+  .rest__table td { padding: 0; }
+}

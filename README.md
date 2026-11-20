@@ -12,20 +12,30 @@ The app has two root layouts, so neither side loads the other's CSS, fonts or sc
 |---|---|---|
 | Routes | `src/app/(site)/**` | `src/app/admin/**` |
 | Root layout | `src/app/(site)/layout.tsx` | `src/app/admin/layout.tsx` |
-| Styles | `src/styles/theme.css`, then `src/styles/site.css` | `src/app/globals.css` (Tailwind 4, dark) |
+| Styles | `src/styles/theme.css`, `src/styles/sheet-kit.css`, then `src/styles/site.css` | `src/app/globals.css` (Tailwind 4, dark) |
 | Fonts | Bebas Neue, EB Garamond | Inter, Space Grotesk, JetBrains Mono |
 | Indexing | indexed, with canonical, `robots.txt`, `sitemap.xml` | `noindex`, disallowed in `robots.txt` |
 
-`src/styles/theme.css` is a verbatim copy of the theme shared with the hub. Do not edit the copy: site-specific rules go in `src/styles/site.css`.
+`src/styles/theme.css`, `src/styles/sheet-kit.css` and `src/lib/sheet-kit.js` (with its `.d.ts`) are verbatim copies of the files shared with the hub: the theme, and the pointer layer (dot-grid sheet, biro point, leaning letters, entrances, the Dark / Light word). Do not edit the copies: site-specific rules go in `src/styles/site.css`. The kit is mounted once, by `src/components/site/SheetKit.tsx`, from the public root layout.
 
 `/admin/**` is gated by `src/proxy.ts` (the Next.js 16 name for middleware), and again by `getAdminUser()` in the dashboard layout and in every admin API route.
 
 ## Where the content lives
 
-- **Projects and toolbox:** `src/lib/data/seed.ts`. It is real content, written from verified facts. `supabase/seed.sql` is generated from it with `node scripts/generate-seed-sql.cjs`.
-- **Pictures:** `public/work/<project-slug>/` (real captures, WebP). The portrait is `public/profile.jpg`.
+The public page is built from typed data in `src/content/`:
+
+- **`work.ts`**: the featured projects (`FEATURED`), the "More work" rows and the toolbox. Adding a project is one new entry in `FEATURED` plus its pictures; the work section lays out whatever the list holds.
+- **`site.ts`**: the words of every other section (bar, hero and its five portraits, about, contact, close).
+- **`pictures.ts`**: every picture with its real width and height.
+
+Other sources:
+
+- **Pictures:** `public/work/…` (WebP, already cropped and sized). They are made from the source captures by `node scripts/pictures.mjs`; the short loop of the game's menu art (`menu-loop.webm` / `.mp4`) and its poster by `node scripts/clip.mjs` (needs ffmpeg). Both scripts read the workspace's `../media` and `../game-web` folders and are only needed when a crop changes. The portrait is `public/profile.jpg`.
 - **Site facts** (name, description, links): `src/lib/constants.ts`.
-- **The game:** `public/games/detektif/` — see below.
+- **The game:** `public/games/detektif/` — see below. It is played on the home page (work section) and on `/play/detektif`; both use `src/components/site/Game.tsx`, which loads nothing before a click.
+- **Admin CMS content:** `src/lib/data/seed.ts` (the same two projects, as the CMS stores them). `supabase/seed.sql` is generated from it with `node scripts/generate-seed-sql.cjs`. The public page does not read the CMS.
+
+The KicauScore block also shows the current top five of that site's public scoreboard (`src/components/site/Standings.tsx`): one GET on the server, cached for ten minutes, three-second limit. If it fails the table is simply not there.
 
 ### Data modes
 

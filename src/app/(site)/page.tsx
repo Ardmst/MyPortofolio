@@ -1,11 +1,25 @@
+import { Hero } from "@/components/site/Hero";
+import { About, Close, Contact, MoreWork } from "@/components/site/Rest";
+import { Work } from "@/components/site/Work";
+
 /**
- * Placeholder home page. It only exists so the app builds and `/` is served
- * statically; the public page is built on top of `src/styles/theme.css` next.
+ * The home page. It is static: built once and, because the KicauScore block
+ * reads that site's public standings, rebuilt in the background at most every
+ * ten minutes (see `components/site/Standings.tsx`).
  */
+export const revalidate = 600;
+
 export default function HomePage() {
   return (
-    <main className="frame section">
-      <h1>ARDMST</h1>
-    </main>
+    <>
+      <main id="top">
+        <Hero />
+        <Work />
+        <About />
+        <MoreWork />
+        <Contact />
+      </main>
+      <Close />
+    </>
   );
 }

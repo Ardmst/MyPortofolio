@@ -1,0 +1,166 @@
+/*
+ * ardmst sheet kit: styles for sheet-kit.js (the "sheet and biro" interaction layer).
+ * Load AFTER theme.css. Copy this file VERBATIM into each repo; do not edit the copies.
+ * Every colour is a theme.css token: --dot, --bloom-1..3 (read by the script), --accent,
+ * --accent-ink, --sky, --bg. Nothing here shows without the script.
+ */
+
+/* ---- the sheet ------------------------------------------------------------- */
+
+/*
+ * The canvas is fixed at z-index -1: above the root background, below everything in flow.
+ * theme.css paints <body> with --bg, and a body background is painted over a negative
+ * z-index child, so while the sheet is mounted the body goes transparent and <html>
+ * (which theme.css also paints with --bg) carries the ground.
+ * The dots show wherever a section has no background of its own.
+ */
+html.has-sheet body { background: transparent; }
+
+.sheet {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: calc(100vh + 28px);   /* one pitch spare: the paper slides up by 0..28px */
+  height: calc(100lvh + 28px);
+  pointer-events: none;
+  animation: sheet-in var(--dur-slow) var(--ease) both;
+}
+
+@keyframes sheet-in { from { opacity: 0; } }
+@keyframes sheet-travel { to { transform: translate3d(0, -28px, 0); } }
+
+/*
+ * The paper travels with the page. A scroll-driven animation repeats a one-pitch slide
+ * --sheet-n times over the whole scroll range (the script keeps --sheet-n at
+ * scroll range / 28), so the grid moves 1:1 with the content on the compositor, with no
+ * scroll handler. Browsers without scroll timelines keep a still grid.
+ * The !important lines out-rank the reduced-motion reset in theme.css, which would stop
+ * the travel (it is scrolling, not animation).
+ */
+@supports (animation-timeline: scroll()) {
+  .sheet {
+    animation: sheet-in var(--ease) both, sheet-travel linear both;
+    animation-timeline: auto, scroll(root block);
+    animation-duration: var(--dur-slow), auto !important;
+    animation-iteration-count: 1, var(--sheet-n, 0) !important;
+  }
+}
+
+/* ---- the biro -------------------------------------------------------------- */
+
+.biro {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+.biro > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: translate;
+}
+
+/* The point: 10px, parked beside the arrow by the script, never under it. */
+.biro__dot {
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--biro-ink, var(--accent));
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease), scale var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
+}
+.biro.is-on .biro__dot { opacity: 1; }
+.biro[data-state="link"] .biro__dot { scale: 1.6; }
+.biro.is-down .biro__dot { scale: 0.85; transition-duration: 140ms; }
+.biro[data-state="label"] .biro__dot,
+.biro[data-state="off"] .biro__dot { opacity: 0; }
+
+/* The disc with a word ("Play"), centred on the hot-spot. */
+.biro__disc {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  margin: -44px 0 0 -44px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: 500 var(--step-body) / 1 var(--font-text), "EB Garamond", Georgia, serif;
+  opacity: 0;
+  scale: 0.3;
+  transition: opacity 180ms var(--ease), scale 180ms var(--ease);
+}
+.biro.is-on[data-state="label"] .biro__disc {
+  opacity: 1;
+  scale: 1;
+  transition-duration: 280ms;
+}
+.biro.is-on.is-down[data-state="label"] .biro__disc { scale: 0.94; transition-duration: 140ms; }
+
+/* The held frame: a picture on the sky field, square, hanging from the pen tip. */
+.biro__frame {
+  box-sizing: border-box;
+  width: clamp(220px, 22vw, 340px);
+  aspect-ratio: var(--biro-ratio, 4 / 3);
+  padding: 10px;
+  background: var(--sky);
+  clip-path: inset(0 100% 100% 0);
+  transition: clip-path 200ms var(--ease);
+}
+.biro__frame.is-fx { clip-path: inset(0 0 100% 100%); }
+.biro__frame.is-fy { clip-path: inset(100% 100% 0 0); }
+.biro__frame.is-fx.is-fy { clip-path: inset(100% 0 0 100%); }
+.biro[data-state="preview"] .biro__frame {
+  clip-path: inset(0);
+  transition-duration: 320ms;
+}
+.biro__pic {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.biro__pic img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  opacity: 0;
+  scale: 1.06;
+  transition: opacity 240ms linear, scale var(--dur) var(--ease);
+}
+.biro__pic img.is-on { opacity: 1; }
+.biro[data-state="preview"] .biro__pic img { scale: 1; }
+
+/* ---- the monument ---------------------------------------------------------- */
+
+/* Letters stand on the baseline: the origin is where Bebas Neue's baseline falls in a
+   0.8 line box. Transform only, so nothing shifts or wraps. */
+.monument__l {
+  display: inline-block;
+  transform-origin: 50% var(--monument-foot, 87.5%);
+}
+
+/* ---- reduced motion: same content, no travel -------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet { animation-duration: 0.01ms, auto !important; }
+  .biro__frame {
+    clip-path: none !important;
+    opacity: 0;
+    transition: opacity var(--dur-fast) linear;
+  }
+  .biro[data-state="preview"] .biro__frame { opacity: 1; }
+  .biro__pic img { scale: 1; }
+}
+
+@media print {
+  .sheet, .biro { display: none; }
+}

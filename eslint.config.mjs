@@ -7,6 +7,13 @@ import coreWebVitals from "eslint-config-next/core-web-vitals";
 const eslintConfig = [
   ...coreWebVitals,
   {
+    // The public site ships pictures that are already cropped, sized and
+    // converted to WebP by scripts/pictures.mjs, with explicit dimensions, so
+    // it uses plain <img> (no optimiser, no extra client script).
+    files: ["src/components/site/**", "src/app/(site)/**"],
+    rules: { "@next/next/no-img-element": "off" },
+  },
+  {
     ignores: [
       ".next/**",
       "node_modules/**",

@@ -2,16 +2,23 @@ import type { Metadata } from "next";
 import { Bebas_Neue, EB_Garamond } from "next/font/google";
 import { siteUrl } from "@/lib/env";
 import { SITE, SITE_ICONS } from "@/lib/constants";
+import { Bar } from "@/components/site/Bar";
+import { SheetKit } from "@/components/site/SheetKit";
 import "@/styles/theme.css";
+import "@/styles/sheet-kit.css";
 import "@/styles/site.css";
 
 /**
  * Root layout for the public site.
  *
- * It loads only the shared theme (`src/styles/theme.css`, a verbatim copy of
- * the workspace's `shared/theme.css`) and this site's own rules
+ * It loads only the shared theme (`src/styles/theme.css`), the shared sheet
+ * kit's styles (`src/styles/sheet-kit.css`), both verbatim copies of the
+ * workspace's `shared/` files, and then this site's own rules
  * (`src/styles/site.css`). No Tailwind, no admin CSS, no admin fonts: those
  * belong to the other root layout, `src/app/admin/layout.tsx`.
+ *
+ * The bar is here, so every public page has it. `<SheetKit />` mounts the
+ * pointer layer once for the whole visit.
  */
 
 const display = Bebas_Neue({
@@ -68,11 +75,22 @@ const BOOT_SCRIPT =
 
 export default function SiteRootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${text.variable}`} suppressHydrationWarning>
+    // `data-scroll-behavior`: theme.css scrolls smoothly inside a page; a change of
+    // page still jumps to the top at once (Next.js 16 asks for this attribute).
+    <html
+      lang="en"
+      className={`${display.variable} ${text.variable}`}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <Bar />
+        {children}
+        <SheetKit />
+      </body>
     </html>
   );
 }
