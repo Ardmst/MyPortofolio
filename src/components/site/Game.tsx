@@ -143,7 +143,8 @@ interface GameStageProps {
 }
 
 export function GameStage({ src, frameTitle, playLabel, poster, clip }: GameStageProps) {
-  const { run, canPlay, play, ready, stage, frame: frameRef } = useGame();
+  const { run, canPlay, play, ready, fill, stage, frame: frameRef } = useGame();
+  const [isFS, setIsFS] = useState(false);
   const video = useRef<HTMLVideoElement | null>(null);
   const watch = useRef<number | null>(null);
 
@@ -181,6 +182,12 @@ export function GameStage({ src, frameTitle, playLabel, poster, clip }: GameStag
     seen.observe(el);
     return () => seen.disconnect();
   }, [run, canPlay]);
+
+  useEffect(() => {
+    const onChange = () => setIsFS(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
 
   useEffect(
     () => () => {
@@ -252,6 +259,22 @@ export function GameStage({ src, frameTitle, playLabel, poster, clip }: GameStag
             allow="fullscreen; autoplay; gamepad"
             onLoad={onLoad}
           />
+          <button
+            type="button"
+            className="stage__fs"
+            onClick={isFS ? () => document.exitFullscreen() : fill}
+            aria-label={isFS ? "Exit full screen" : "Full screen"}
+          >
+            {isFS ? (
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M5 1v4H1M11 1v4h4M5 15v-4H1M11 15v-4h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M1 5V1h4M15 5V1h-4M1 11v4h4M15 11v4h-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </button>
         </div>
       ) : canPlay ? (
         <button

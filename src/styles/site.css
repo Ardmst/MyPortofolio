@@ -509,6 +509,22 @@ html:not(.js) .stage__clip { display: none; }
   flex: none;
   gap: 1.25rem;
 }
+.stage__fs {
+  position: absolute;
+  bottom: 0.625rem;
+  right: 0.625rem;
+  z-index: 1;
+  display: flex;
+  padding: 0.375rem;
+  background: oklch(0% 0 0 / 0.45);
+  color: #fff;
+  border: 0;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background var(--dur-fast, 100ms);
+}
+.stage__fs:hover { background: oklch(0% 0 0 / 0.7); }
+.stage__fs:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* ---- an interface capture on the project's colour field ---------------------------------------------- */
 
