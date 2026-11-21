@@ -65,7 +65,11 @@ function Shot({
 function Project({ project }: { project: FeaturedProject }) {
   const { live, visual } = project;
   const titleId = `work-${project.slug}`;
-  const style = { "--field": project.field, "--project-ratio": visual.ratio } as CSSProperties;
+  const style = {
+    "--field": project.field,
+    "--project-ratio": visual.ratio,
+    "--tall-ratio": visual.tallRatio ?? "4 / 5",
+  } as CSSProperties;
   const onField = visual.frame === "field";
 
   /* What a wide screen shows: the game stage, or the wide picture. */

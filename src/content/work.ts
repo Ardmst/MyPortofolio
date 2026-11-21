@@ -64,6 +64,8 @@ export interface FeaturedProject {
     frame: "flush" | "field";
     /** Proportion of the box on a wide screen, as CSS (`16 / 9`). */
     ratio: string;
+    /** Proportion of the box on a phone/touch screen, as CSS (`4 / 5`). */
+    tallRatio?: string;
     wide: Picture;
     /** One line under the wide picture saying what it shows. */
     wideCaption: string;
@@ -133,12 +135,13 @@ export const FEATURED: FeaturedProject[] = [
     field: "var(--field-kicau)",
     biroInk: "#fff",
     visual: {
-      frame: "field",
-      ratio: "5 / 4",
+      frame: "flush",
+      ratio: "1240 / 880",
+      tallRatio: "1240 / 880",
       wide: PICTURES.kicauscore.home,
       wideCaption: "A contest page: venue, date, hours and the bird classes.",
-      tall: PICTURES.kicauscore.homePhone,
-      tallCaption: "A contest page, on a phone.",
+      tall: PICTURES.kicauscore.home,
+      tallCaption: "A contest page: venue, date, hours and the bird classes.",
     },
     cluster: PICTURES.kicauscore.standings,
     clusterField: "var(--field-mint)",
