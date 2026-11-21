@@ -144,9 +144,8 @@ export const FEATURED: FeaturedProject[] = [
     clusterField: "var(--field-mint)",
     live: {
       kind: "site",
-      href: "https://kicaumania.ardmst.my.id/scoreboard/murai-batu-vip-36g",
-      label: "Open the live scoreboard",
-      caption: "Demo data.",
+      href: "https://kicaumania.ardmst.my.id",
+      label: "Open KicauScore",
     },
   },
 ];
