@@ -117,8 +117,8 @@ export const PICTURES = {
     },
     home: {
       src: "/work/kicauscore/home-card.webp",
-      width: 705,
-      height: 539,
+      width: 1240,
+      height: 880,
       alt: "KicauScore contest page: the event with its venue, date and hours, the bird classes and the category rundown",
     },
     homeCluster: {
