@@ -1,14 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512" role="img" aria-label="Ardmst shield">
   <style>
-    .bg { fill: transparent; }
     .fg { stroke: #1f1f1f; fill: none; stroke-width: 5.5; stroke-linejoin: round; stroke-linecap: round; }
     @media (prefers-color-scheme: dark) {
-      .bg { fill: #131314; }
       .fg { stroke: #ffffff; }
     }
   </style>
   <!-- shield frame -->
-  <path class="bg fg" d="M50 91 L14.5 67.5 L14.5 20 Q14.5 9 25.5 9 L74.5 9 Q85.5 9 85.5 20 L85.5 67.5 Z"/>
+  <path class="fg" d="M50 91 L14.5 67.5 L14.5 20 Q14.5 9 25.5 9 L74.5 9 Q85.5 9 85.5 20 L85.5 67.5 Z"/>
   <!-- solid diagonal -->
   <path class="fg" d="M19.5 37.5 L81.5 65.5"/>
   <!-- wavy diagonal -->
