@@ -219,7 +219,7 @@ function sheet() {
   const read = () => {
     const style = getComputedStyle(root);
     ink = ['--dot', '--bloom-3', '--bloom-2', '--bloom-1'].map((name) => style.getPropertyValue(name).trim());
-    swell = 0; // dots stay the same size; only colour blooms
+    swell = 0.9; // dots near cursor grow slightly; most dots stay small
   };
 
   // Redraw whole cells c0..c1 × r0..r1: one path per colour, four fills at most.

@@ -147,10 +147,6 @@ export const FEATURED: FeaturedProject[] = [
       href: "https://kicaumania.ardmst.my.id/scoreboard/murai-batu-vip-36g",
       label: "Open the live scoreboard",
       caption: "Demo data.",
-      standings: {
-        api: "https://kicaumania.ardmst.my.id/api/scoreboard/murai-batu-vip-36g",
-        caption: "The top five right now, read from the live scoreboard. Demo data.",
-      },
     },
   },
 ];
