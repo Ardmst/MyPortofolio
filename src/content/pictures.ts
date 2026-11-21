@@ -144,7 +144,7 @@ export const PICTURES = {
       src: "/work/about/portrait-square.webp",
       width: 480,
       height: 480,
-      alt: "Rifkhi Ardi Mustaqim",
+      alt: "Portrait of Rifkhi Ardi Mustaqim in round glasses, in black and white",
     },
   },
 } as const satisfies Record<string, Record<string, Picture>>;

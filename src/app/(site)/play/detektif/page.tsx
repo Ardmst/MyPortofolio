@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Close } from "@/components/site/Close";
 import { Game, GameNote, GamePlay, GameStage } from "@/components/site/Game";
 import { Pic } from "@/components/site/Pic";
-import { Close } from "@/components/site/Rest";
 import { PICTURES } from "@/content/pictures";
 import { FEATURED } from "@/content/work";
 

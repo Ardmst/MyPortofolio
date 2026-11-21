@@ -110,27 +110,51 @@ export const ABOUT = {
 export const LIST = {
   more: "More work",
   toolbox: "Toolbox",
+  /** Read out after a row's name, so a link says where it goes. Never shown. */
+  goes: {
+    live: "the live site, opens in a new tab",
+    repo: "the repository on GitHub, opens in a new tab",
+  },
+  /** Column names for screen readers; on the page the fixed column starts do the organising. */
+  columns: {
+    more: ["Project", "What it is", "Built with", "Year"],
+    toolbox: ["Tool", "Used for", "Where"],
+  },
 } as const;
+
+/** One address row of the contact section: the address at display size, a short note at the far end. */
+export interface ContactRow {
+  label: string;
+  href: string;
+  /** What is behind the address, in a few words. */
+  note: string;
+  /** Opens in a new tab: anything that is not one of these two sites or the mail program. */
+  newTab?: boolean;
+}
 
 export const CONTACT_SECTION = {
   /** The greeting row is the section's heading; its round button writes the mail. */
   greeting: "Say hello",
+  /** Accessible name of the round arrow button. */
+  write: `Write an email to ${CONTACT.email}`,
   rows: [
-    { label: CONTACT.email, href: CONTACT.mailto },
-    { label: CONTACT.github.label, href: CONTACT.github.href },
-    { label: CONTACT.linkedin.label, href: CONTACT.linkedin.href },
-    { label: CONTACT.hub.label, href: CONTACT.hub.href },
-  ],
+    { label: CONTACT.email, href: CONTACT.mailto, note: "Email" },
+    { label: CONTACT.github.label, href: CONTACT.github.href, note: "Code and experiments", newTab: true },
+    { label: CONTACT.linkedin.label, href: CONTACT.linkedin.href, note: "The professional version", newTab: true },
+    { label: CONTACT.hub.label, href: CONTACT.hub.href, note: "Every site I run" },
+  ] satisfies ContactRow[],
 } as const;
 
 export const CLOSE = {
   invitation: "Have something that needs building?",
   action: { label: "Write to me", href: CONTACT.mailto },
   links: [
-    { label: "GitHub", href: SITE.githubUrl },
-    { label: "LinkedIn", href: SITE.linkedinUrl },
-    { label: "ardmst.my.id", href: SITE.hubUrl },
+    { label: "GitHub", href: SITE.githubUrl, newTab: true },
+    { label: "LinkedIn", href: SITE.linkedinUrl, newTab: true },
+    { label: "ardmst.my.id", href: SITE.hubUrl, newTab: false },
   ],
+  /** What a screen reader says for the derivation line. */
+  fullName: "Ardi Mustaqim",
   /**
    * The name with the letters the handle drops. `kept` parts are set in full
    * ink, the others in the soft ink: ARD·I· M·U·ST·AQIM.

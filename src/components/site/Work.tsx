@@ -112,13 +112,13 @@ function Project({ project }: { project: FeaturedProject }) {
 
   const parts = (
     <>
-      <div className={live.kind === "game" ? "project__visual project__visual--game" : "project__visual"} data-rise="">
+      <div className={live.kind === "game" ? "project__visual project__visual--game" : "project__visual"} data-rise="open">
         {wide}
         {tall}
       </div>
 
       <div className="project__cluster">
-        <div data-rise="" data-rise-i="1">
+        <div data-rise="open" data-rise-i="1">
           {project.clusterField ? (
             <Shot picture={project.cluster} variant="small" field={project.clusterField} />
           ) : (

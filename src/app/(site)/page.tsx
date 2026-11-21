@@ -1,5 +1,8 @@
+import { About } from "@/components/site/About";
+import { Close } from "@/components/site/Close";
+import { Contact } from "@/components/site/Contact";
 import { Hero } from "@/components/site/Hero";
-import { About, Close, Contact, MoreWork } from "@/components/site/Rest";
+import { LineUp } from "@/components/site/LineUp";
 import { Work } from "@/components/site/Work";
 
 /**
@@ -16,7 +19,7 @@ export default function HomePage() {
         <Hero />
         <Work />
         <About />
-        <MoreWork />
+        <LineUp />
         <Contact />
       </main>
       <Close />
