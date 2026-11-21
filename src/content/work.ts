@@ -135,8 +135,8 @@ export const FEATURED: FeaturedProject[] = [
     visual: {
       frame: "field",
       ratio: "5 / 4",
-      wide: PICTURES.kicauscore.standings,
-      wideCaption: "The live standings of one contest class.",
+      wide: PICTURES.kicauscore.home,
+      wideCaption: "A contest page: venue, date, hours and the bird classes.",
       tall: PICTURES.kicauscore.homePhone,
       tallCaption: "A contest page, on a phone.",
     },
