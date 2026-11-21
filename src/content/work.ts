@@ -140,7 +140,7 @@ export const FEATURED: FeaturedProject[] = [
       tall: PICTURES.kicauscore.homePhone,
       tallCaption: "A contest page, on a phone.",
     },
-    cluster: PICTURES.kicauscore.home,
+    cluster: PICTURES.kicauscore.standings,
     clusterField: "var(--field-mint)",
     live: {
       kind: "site",
