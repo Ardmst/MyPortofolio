@@ -10,8 +10,8 @@
 
 const W = typeof window === 'object' && window.document ? window : null;
 const D = W && W.document;
-const PITCH = 28; // dot pitch in px; sheet-kit.css uses the same number
-const REACH = 150; // how far from the pointer dots wake
+const PITCH = 18; // dot pitch in px; sheet-kit.css uses the same number
+const REACH = 110; // how far from the pointer dots wake
 const PASSIVE = { passive: true };
 const noop = () => {};
 
@@ -219,7 +219,7 @@ function sheet() {
   const read = () => {
     const style = getComputedStyle(root);
     ink = ['--dot', '--bloom-3', '--bloom-2', '--bloom-1'].map((name) => style.getPropertyValue(name).trim());
-    swell = root.dataset.theme === 'dark' ? 1.75 : 2.25;
+    swell = 0; // dots stay the same size; only colour blooms
   };
 
   // Redraw whole cells c0..c1 × r0..r1: one path per colour, four fills at most.
@@ -229,7 +229,7 @@ function sheet() {
       const row = ((base + r) % rows) * cols;
       for (let c = c0; c <= c1; c++) {
         const v = energy[row + c];
-        const push = 6 * v * v * v;
+        const push = 0; // no displacement; dots stay on grid
         const x = c * PITCH + 14 + ux[row + c] * push;
         const y = r * PITCH + 14 + uy[row + c] * push;
         const radius = 1 + swell * v * v;

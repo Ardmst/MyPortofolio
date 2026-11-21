@@ -65,20 +65,7 @@ html.has-sheet body { background: transparent; }
 }
 
 /* The point: 10px, parked beside the arrow by the script, never under it. */
-.biro__dot {
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border-radius: 50%;
-  background: var(--biro-ink, var(--accent));
-  opacity: 0;
-  transition: opacity var(--dur-fast) var(--ease), scale var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
-}
-.biro.is-on .biro__dot { opacity: 1; }
-.biro[data-state="link"] .biro__dot { scale: 1.6; }
-.biro.is-down .biro__dot { scale: 0.85; transition-duration: 140ms; }
-.biro[data-state="label"] .biro__dot,
-.biro[data-state="off"] .biro__dot { opacity: 0; }
+.biro__dot { display: none; } /* follower dot removed — polkadot sheet is enough */
 
 /* The disc with a word ("Play"), centred on the hot-spot. */
 .biro__disc {
