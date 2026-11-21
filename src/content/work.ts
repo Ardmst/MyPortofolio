@@ -135,12 +135,12 @@ export const FEATURED: FeaturedProject[] = [
     visual: {
       frame: "field",
       ratio: "5 / 4",
-      wide: PICTURES.kicauscore.homePhone,
-      wideCaption: "A contest page on a phone: classes, schedule and venue.",
+      wide: PICTURES.kicauscore.home,
+      wideCaption: "A contest page: venue, date, hours and the bird classes.",
       tall: PICTURES.kicauscore.homePhone,
       tallCaption: "A contest page, on a phone.",
     },
-    cluster: PICTURES.kicauscore.standings,
+    cluster: PICTURES.kicauscore.homeCluster,
     clusterField: "var(--field-mint)",
     live: {
       kind: "site",

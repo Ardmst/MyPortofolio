@@ -121,6 +121,12 @@ export const PICTURES = {
       height: 620,
       alt: "KicauScore contest page: the event with its venue, date and hours, and the bird classes being judged",
     },
+    homeCluster: {
+      src: "/work/kicauscore/home-cluster.webp",
+      width: 1440,
+      height: 900,
+      alt: "The KicauScore portfolio page: the green contest field and an open contest card",
+    },
   },
 
   more: {
