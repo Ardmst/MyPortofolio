@@ -6,8 +6,8 @@ import { CLOSE } from "@/content/site";
  * A whole field of the inverse colour (deep blue in the dark theme): the
  * invitation and its one button, a few links, then the name the handle comes
  * from with the letters it dropped in the soft ink, the legal row, and the
- * monument again, cut by the bottom edge. The field, the legal row and the
- * cropped name come from theme.css (`.close`); the rest is in site.css.
+ * monument again, fitted to the width and cut by the bottom edge. Every rule
+ * of it is in theme.css (`.close`), with this markup; site.css adds none.
  *
  * The cropped name is plain text, so the sheet kit can split it into letters;
  * it repeats the page's h1, so it is hidden from assistive technology.
@@ -20,12 +20,15 @@ export function Close() {
           <h2 className="close__say" data-rise="">
             {CLOSE.invitation}
           </h2>
-          {/* The entrance is on the wrapper, so the button keeps its own press and hover timing. */}
-          <p className="close__act" data-rise="" data-rise-i="1">
-            <a className="button close__go" href={CLOSE.action.href}>
-              {CLOSE.action.label}
-            </a>
-          </p>
+          <a
+            className="button"
+            href={CLOSE.action.href}
+            data-biro-ink="var(--field-1)"
+            data-rise=""
+            data-rise-i="1"
+          >
+            {CLOSE.action.label}
+          </a>
         </div>
         <ul className="close__links">
           {CLOSE.links.map((link, i) => (

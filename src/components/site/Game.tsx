@@ -147,6 +147,23 @@ export function GameStage({ src, frameTitle, playLabel, poster, clip }: GameStag
   const video = useRef<HTMLVideoElement | null>(null);
   const watch = useRef<number | null>(null);
 
+  // The loop gets its poster frame when the stage comes near (the picture under it is the same
+  // file, already loading lazily), so the first screen never pays for it.
+  useEffect(() => {
+    const el = video.current;
+    if (!el || run || !("IntersectionObserver" in window)) return;
+    const near = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        el.poster = poster.src;
+        near.disconnect();
+      },
+      { rootMargin: "50% 0px" },
+    );
+    near.observe(el);
+    return () => near.disconnect();
+  }, [run, canPlay, poster.src]); // canPlay: on a touch screen the picture is rendered anew, with a new <video>
+
   // The loop plays only while it is in view, never with reduced motion or Save-Data.
   useEffect(() => {
     const el = video.current;
@@ -163,7 +180,7 @@ export function GameStage({ src, frameTitle, playLabel, poster, clip }: GameStag
     );
     seen.observe(el);
     return () => seen.disconnect();
-  }, [run]);
+  }, [run, canPlay]);
 
   useEffect(
     () => () => {
@@ -194,24 +211,31 @@ export function GameStage({ src, frameTitle, playLabel, poster, clip }: GameStag
     }, 400);
   };
 
-  const picture = clip ? (
-    <video
-      ref={video}
-      className="stage__clip"
-      width={poster.width}
-      height={poster.height}
-      poster={poster.src}
-      muted
-      loop
-      playsInline
-      preload="none"
-      aria-hidden="true"
-    >
-      <source src={clip.webm} type="video/webm" />
-      <source src={clip.mp4} type="video/mp4" />
-    </video>
-  ) : (
+  // The resting picture is a lazy image, so nothing of the stage is fetched until it is near;
+  // a `poster` on the video would be fetched with the page. The loop lies over it.
+  const still = (
     <img src={poster.src} width={poster.width} height={poster.height} alt="" loading="lazy" decoding="async" />
+  );
+  const picture = clip ? (
+    <>
+      {still}
+      <video
+        ref={video}
+        className="stage__clip"
+        width={poster.width}
+        height={poster.height}
+        muted
+        loop
+        playsInline
+        preload="none"
+        aria-hidden="true"
+      >
+        <source src={clip.webm} type="video/webm" />
+        <source src={clip.mp4} type="video/mp4" />
+      </video>
+    </>
+  ) : (
+    still
   );
 
   return (
@@ -234,6 +258,8 @@ export function GameStage({ src, frameTitle, playLabel, poster, clip }: GameStag
           type="button"
           className="stage__box stage__still"
           onClick={play}
+          // The play button beside the stage is the one tab stop; the picture stays clickable.
+          tabIndex={-1}
           data-biro="label"
           data-biro-label="Play"
           aria-label={`${playLabel}: ${frameTitle}`}
@@ -254,7 +280,11 @@ export function GamePlay({ label, className }: { label: string; className?: stri
   const { run, play } = useGame();
   if (run) return null;
   return (
-    <button type="button" className={["button", "if-keys", className ?? ""].filter(Boolean).join(" ")} onClick={play}>
+    <button
+      type="button"
+      className={["button", "if-keys", "needs-js", className ?? ""].filter(Boolean).join(" ")}
+      onClick={play}
+    >
       {label}
     </button>
   );

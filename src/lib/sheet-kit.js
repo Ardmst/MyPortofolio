@@ -130,7 +130,9 @@ function theme() {
   const sync = () => {
     const dark = root.dataset.theme === 'dark';
     D.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-      (button.querySelector('[data-theme-label]') || button).textContent = dark ? 'Light' : 'Dark';
+      const label = button.querySelector('[data-theme-label]');
+      if (!label && button.firstElementChild) return; // both words are in the markup: theme.css shows one
+      (label || button).textContent = dark ? 'Light' : 'Dark';
       button.setAttribute('aria-pressed', dark);
     });
   };
@@ -396,6 +398,9 @@ function biro() {
   let aim; // the element the state was resolved from
   let row = null; // the target whose picture is showing
   let box; // its rectangle
+  let band = 0; // [left, right] of the free stretch inside a row that keeps its frame (data-biro-place="gap")
+  let lifted = null; // the row marked data-biro-held: its picture is in the frame
+  let jump = 0; // the frame is opening: it starts at its place, not where it was last
   let pinned = false; // the frame is fixed beside the row (keyboard, reduced motion)
   let keyed = false;
   let shown = 0;
@@ -427,23 +432,63 @@ function biro() {
   const size = () => {
     vw = D.documentElement.clientWidth;
     vh = W.innerHeight;
+    band = 0;
+    if (row) {
+      box = row.getBoundingClientRect();
+      if (row.dataset.biroPlace === 'gap') {
+        // the widest stretch between what the row's children hold, less one dot pitch of air each side
+        const range = D.createRange();
+        const kids = [...row.children]
+          .map((el) => (range.selectNodeContents(el), range.getBoundingClientRect()))
+          .sort((a, b) => a.left - b.left);
+        let lo = 0;
+        let hi = 0;
+        kids.forEach((kid, i) => {
+          const next = kids[i + 1];
+          if (next && next.left - kid.right > hi - lo) {
+            lo = kid.right;
+            hi = next.left;
+          }
+        });
+        band = [lo + PITCH, hi - PITCH];
+      }
+    }
+    held.style.height = band ? box.height + 'px' : '';
+    held.classList.toggle('is-gap', !!band);
     fw = held.offsetWidth;
     fh = held.offsetHeight;
-    if (row) box = row.getBoundingClientRect();
   };
-  const go = (node, p, x, y, k) => {
+  const go = (node, p, x, y, k, ky = k) => {
     const dx = x - p.x;
     const dy = y - p.y;
     p.x += dx * k;
-    p.y += dy * k;
+    p.y += dy * ky;
     node.style.translate = `${p.x.toFixed(1)}px ${p.y.toFixed(1)}px`;
     return Math.abs(dx) + Math.abs(dy) > 0.2;
   };
+  const lift = (el) => {
+    if (el === lifted) return;
+    if (lifted) lifted.removeAttribute('data-biro-held');
+    lifted = el;
+    if (el) el.setAttribute('data-biro-held', '');
+  };
+  // In a row that keeps its frame: open while the stretch can hold it and the pointer has
+  // not passed it. The row is marked while its picture is in the frame.
+  const seat = (x) => {
+    const open = band[1] - band[0] >= fw && x < band[1];
+    held.classList.remove('is-fx', 'is-fy');
+    held.classList.toggle('is-out', !open);
+    lift(open ? row : null);
+  };
   // Beside the row when there is room, otherwise under (or over) its right end:
-  // the focused row itself is never covered.
+  // the focused row itself is never covered. A row that keeps its frame holds it mid-stretch.
   const place = () => {
     let x = box.right + 20;
     let y = box.top + (box.height - fh) / 2;
+    if (band) {
+      seat(0);
+      return go(held, at[2], (band[0] + band[1] - fw) / 2, box.top, 1);
+    }
     if (x + fw > vw - 16) {
       x = box.right - fw - 16;
       y = box.bottom + 12;
@@ -458,14 +503,18 @@ function biro() {
     aim = target;
     pinned = pin;
     row = null;
+    lift(null);
+    held.classList.remove('is-out');
     if (kind === 'preview') {
       const src = target.dataset.biroSrc;
       const next = imgs[1 - shown];
       warm();
       held.style.setProperty('--biro-ratio', target.dataset.biroRatio || '');
       row = target;
+      jump = state !== kind;
       size();
       if (pin) place();
+      else if (band) seat(mx);
       if (src !== wanted) {
         wanted = src;
         next.alt = target.dataset.biroAlt || '';
@@ -500,7 +549,14 @@ function biro() {
     const x = ptr.x;
     const y = ptr.y;
     let busy = go(dot, at[0], x + 14, y + 16, k(80)) | go(disc, at[1], x, y, k(100));
-    if (!(row && pinned)) {
+    const kf = jump ? 1 : k(130);
+    jump = 0;
+    if (row && band && !pinned) {
+      // A row that keeps its frame: the frame follows the pointer along the free stretch
+      // between the row's name and its note, locked to the row, and covers no neighbour.
+      seat(x);
+      busy |= go(held, at[2], clamp(x + 20, band[0], band[1] - fw), box.top, kf, 1);
+    } else if (!(row && pinned)) {
       // The frame follows the pointer along the row and hangs from the row's lower edge,
       // so the row being read is never covered; it turns round at the viewport edges.
       // Over a tall target it hangs from the pen tip instead.
@@ -515,7 +571,7 @@ function biro() {
         at[2],
         clamp(fx ? x - 20 - fw : x + 20, 16, vw - fw - 16),
         clamp(fy ? (docks ? box.top : y - 20) - fh : under, 16, vh - fh - 16),
-        k(130),
+        kf,
       );
     }
     away = false;
@@ -563,6 +619,7 @@ function biro() {
   return () => {
     off();
     (W.cancelIdleCallback || clearTimeout)(later);
+    lift(null);
     root.remove();
   };
 }

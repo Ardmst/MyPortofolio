@@ -150,10 +150,13 @@ function Project({ project }: { project: FeaturedProject }) {
         {live.kind === "game" ? (
           <>
             <GamePlay label={live.play} />
-            <Link className="link if-keys" href={live.page}>
+            <Link className="link if-keys needs-js" href={live.page}>
               {live.full}
             </Link>
             <p className="if-touch">{live.phoneNote}</p>
+            <noscript>
+              <p className="if-keys">{live.noScript}</p>
+            </noscript>
           </>
         ) : (
           <>

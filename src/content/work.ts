@@ -27,6 +27,8 @@ export type ProjectLive =
       full: string;
       /** Shown instead of the play button where there is no keyboard. */
       phoneNote: string;
+      /** Shown instead of the play button when script is off. */
+      noScript: string;
       /** While the build downloads. */
       loading: string;
       /** The controls, once it runs. */
@@ -112,6 +114,7 @@ export const FEATURED: FeaturedProject[] = [
       play: "Play it here",
       full: "Open full screen",
       phoneNote: "It needs a keyboard. Open this page on a computer to play.",
+      noScript: "The game needs JavaScript.",
       loading: "Loading about 48 MB. WASD to move, E to interact, Space to continue, Esc to pause.",
       controls: "WASD to move, E to interact, Space to continue, Esc to pause.",
       restart: "Restart",

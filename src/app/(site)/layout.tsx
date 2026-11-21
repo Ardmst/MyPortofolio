@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, EB_Garamond } from "next/font/google";
+import { EB_Garamond } from "next/font/google";
+import localFont from "next/font/local";
 import { siteUrl } from "@/lib/env";
 import { SITE, SITE_ICONS } from "@/lib/constants";
 import { Bar } from "@/components/site/Bar";
@@ -21,16 +22,33 @@ import "@/styles/site.css";
  * pointer layer once for the whole visit.
  */
 
-const display = Bebas_Neue({
+/**
+ * Bebas Neue, self-hosted from the @fontsource package (the file Google Fonts serves), as the
+ * shared theme asks (workspace `shared/README.md`, "Fonts"): theme.css measures the fitted name
+ * (`--name-fit`, `--name-left`) against this face loaded this way.
+ *
+ * The overrides cut the face's line box to its capitals: it declares 0.95em of ascent over
+ * letters 0.7em tall, and at monument size that invisible box lies over whatever stands near the
+ * name. No baseline moves. `display: "block"`, not "swap": every fallback face is nearly twice
+ * as wide, so a swapped-in fallback would paint the fitted name cut off by the right edge.
+ */
+const display = localFont({
+  src: "../../../node_modules/@fontsource/bebas-neue/files/bebas-neue-latin-400-normal.woff2",
   weight: "400",
-  subsets: ["latin"],
+  style: "normal",
   variable: "--font-display",
-  display: "swap",
+  display: "block",
+  declarations: [
+    { prop: "ascent-override", value: "70%" },
+    { prop: "descent-override", value: "10%" },
+    { prop: "line-gap-override", value: "0%" },
+  ],
 });
 
+/** EB Garamond, upright only: nothing on these pages is set in italic, and the italic file is 48 kB. */
 const text = EB_Garamond({
   subsets: ["latin"],
-  style: ["normal", "italic"],
+  style: ["normal"],
   variable: "--font-text",
   display: "swap",
 });
@@ -39,7 +57,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: SITE.title,
-    template: `%s — ${SITE.name}`,
+    template: `${SITE.name}: %s`,
   },
   description: SITE.description,
   applicationName: SITE.name,
@@ -87,6 +105,9 @@ export default function SiteRootLayout({ children }: { children: React.ReactNode
         <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
       </head>
       <body>
+        <a className="skip" href="#main">
+          Skip to the content
+        </a>
         <Bar />
         {children}
         <SheetKit />

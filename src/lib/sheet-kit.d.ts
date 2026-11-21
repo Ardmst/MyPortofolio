@@ -16,7 +16,9 @@ export type Cleanup = () => void;
  * `localStorage["ardmst-theme"]`, and keeps the button's text ("Dark" while light is
  * showing, "Light" while dark is showing) and `aria-pressed` in step. Light is the
  * default whatever the OS prefers. If the button holds a `[data-theme-label]` element,
- * only that element's text is changed.
+ * only that element's text is changed. If it holds both words as elements
+ * (`.bar__to-dark` / `.bar__to-light`, switched by theme.css: the preferred markup, right
+ * before script runs), the kit leaves its text and attributes alone.
  */
 export function initTheme(): Cleanup;
 
@@ -40,6 +42,9 @@ export function initSheet(): Cleanup;
  * state from the element under the pointer:
  * - `data-biro="preview"` + `data-biro-src` (+ `data-biro-alt`, `data-biro-ratio="16 / 9"`):
  *   the held picture frame; also shown beside the target on keyboard focus;
+ *   with `data-biro-place="gap"` the frame stays inside the row, as tall as the row, in
+ *   the widest free stretch between what the row's children hold (or does not open when
+ *   that stretch cannot hold it), and the row carries `data-biro-held` while it is open;
  * - `data-biro="label"` + `data-biro-label="Play"`: a disc with the word;
  * - plain `a` / `button`: the point swells;
  * - `iframe`, `[data-ui]`, `data-biro="off"`: the point steps aside;

@@ -51,7 +51,7 @@ export default function PlayDetektifPage() {
 
   return (
     <>
-      <main className="play">
+      <main className="play" id="main">
         <Game>
           <header className="play__head">
             <div>
@@ -80,6 +80,9 @@ export default function PlayDetektifPage() {
               fullscreen="Full screen"
             />
             <p className="if-touch play__touch">{live.phoneNote}</p>
+            <noscript>
+              <p className="if-keys play__touch">{live.noScript}</p>
+            </noscript>
           </div>
         </Game>
 

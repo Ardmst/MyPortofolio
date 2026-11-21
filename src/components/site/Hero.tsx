@@ -7,7 +7,9 @@ import { Pic } from "@/components/site/Pic";
  * The hero: "Pinned title over portraits".
  *
  * The monument (the page's h1) is pinned at the top of the screen while the
- * portraits arrive beneath it, one sheet of flat colour each. A sheet docks
+ * portraits arrive beneath it, one sheet of flat colour each (a 2:3 portrait on
+ * an upright screen; on a wide one a landscape crop of the same source, standing
+ * on the fold). A sheet docks
  * under the letters' feet and covers the one before it, so no picture ever
  * passes behind the name; the band the name stands on takes the ground and the
  * ink of the sheet that has docked (`data-step`, set by `<HeroPin />`).
@@ -58,7 +60,8 @@ export function Hero() {
               <Pic
                 picture={step.picture}
                 className="hero__pic"
-                sizes="(max-width: 899px) 92vw, 30vw"
+                sizes="(max-width: 899px) 92vw, 42vw"
+                wideFrom="(min-width: 900px) and (min-height: 560px)"
                 eager={first}
               />
               <figcaption className="small hero__cap">{step.caption}</figcaption>

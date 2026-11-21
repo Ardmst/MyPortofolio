@@ -10,7 +10,7 @@ export const SITE = {
   /** Handle is derived from the name: Ard(i) M(u)st(aqim) → ardmst. */
   handle: "ardmst",
   fullName: "Rifkhi Ardi Mustaqim",
-  title: "Ardmst — Rifkhi Ardi Mustaqim, web apps and games",
+  title: "Ardmst: Rifkhi Ardi Mustaqim, web apps and games",
   description:
     "Rifkhi Ardi Mustaqim builds web apps and games in Indonesia. Two of them are live below: open one, play the other.",
   location: "Indonesia",

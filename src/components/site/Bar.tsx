@@ -5,9 +5,10 @@ import { BAR } from "@/content/site";
  * The bar: the wordmark (to the hub), three plain links and the theme word.
  * No chrome. It sits at the top of the page and scrolls away with it.
  *
- * The theme button is rendered exactly as the sheet kit expects it: the kit
- * sets its word ("Dark" while light shows, "Light" while dark shows) and
- * `aria-pressed`. Keep it in a server component: the kit changes its text.
+ * The theme button carries both words and theme.css shows one ("Dark" while
+ * light shows, "Light" while dark shows), so the word is right before any
+ * script runs and the button's name is always the word on screen. The sheet
+ * kit only handles the click.
  */
 export function Bar() {
   return (
@@ -22,8 +23,9 @@ export function Bar() {
             {link.label}
           </Link>
         ))}
-        <button className="bar__theme" type="button" data-theme-toggle aria-pressed="false">
-          Dark
+        <button className="bar__theme" type="button" data-theme-toggle>
+          <span className="bar__to-dark">Dark</span>
+          <span className="bar__to-light">Light</span>
         </button>
       </nav>
     </header>

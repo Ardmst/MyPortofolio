@@ -45,6 +45,12 @@ export interface HeroPortrait {
   biroInk?: string;
 }
 
+/**
+ * Four sheets: the portrait, then the game twice (its key art, one of its maps), then the
+ * scoreboard, in the order the work section follows. The pinned name must be gone within three
+ * screens, so a fifth sheet (KicauScore's bird profile, on the sky field) was taken out: the
+ * scoreboard is already there, and again in the work below.
+ */
 export const HERO = {
   /** The monument. It is the page's h1. */
   name: "ARDMST",
@@ -66,13 +72,6 @@ export const HERO = {
       biroInk: "#fff",
     },
     {
-      picture: PICTURES.hero.standings,
-      caption: "KicauScore, live standings (demo data)",
-      ground: "var(--field-kicau)",
-      ink: "var(--on-field)",
-      biroInk: "#fff",
-    },
-    {
       picture: PICTURES.hero.burntLand,
       caption: "Detektif Ekosistem, the burnt land of stage two",
       ground: "var(--field-ember)",
@@ -80,10 +79,11 @@ export const HERO = {
       biroInk: "#fff",
     },
     {
-      picture: PICTURES.hero.birdProfile,
-      caption: "KicauScore, a bird's profile (demo data)",
-      ground: "var(--sky)",
-      ink: "var(--sky-ink)",
+      picture: PICTURES.hero.standings,
+      caption: "KicauScore, live standings (demo data)",
+      ground: "var(--field-kicau)",
+      ink: "var(--on-field)",
+      biroInk: "#fff",
     },
   ] satisfies HeroPortrait[],
 } as const;

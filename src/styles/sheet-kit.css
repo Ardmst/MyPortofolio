@@ -119,6 +119,14 @@ html.has-sheet body { background: transparent; }
   clip-path: inset(0);
   transition-duration: 320ms;
 }
+/*
+ * A row with data-biro-place="gap" keeps the frame inside itself: as tall as the row (the
+ * script sets the height, the ratio gives the width), in the free stretch between the
+ * row's name and its note. It is put down (is-out) while the pointer is past that stretch
+ * or the stretch cannot hold it.
+ */
+.biro__frame.is-gap { width: auto; }
+.biro .biro__frame.is-out { clip-path: inset(0 100% 100% 0); }
 .biro__pic {
   position: relative;
   width: 100%;
@@ -158,6 +166,7 @@ html.has-sheet body { background: transparent; }
     transition: opacity var(--dur-fast) linear;
   }
   .biro[data-state="preview"] .biro__frame { opacity: 1; }
+  .biro .biro__frame.is-out { opacity: 0; }
   .biro__pic img { scale: 1; }
 }
 

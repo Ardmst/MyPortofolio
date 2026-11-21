@@ -15,7 +15,7 @@ export const revalidate = 600;
 export default function HomePage() {
   return (
     <>
-      <main id="top">
+      <main id="main">
         <Hero />
         <Work />
         <About />

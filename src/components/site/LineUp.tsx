@@ -14,9 +14,10 @@ import { MORE_WORK, TOOLBOX } from "@/content/work";
  *    explicit `role`s keep it a table for assistive technology in every browser;
  *  - in a linked row the first cell spans the whole row and its link fills it, so the row is
  *    one target; the other cells let the pointer through. The link carries the biro preview
- *    (`data-biro="preview"`), and its box is the row the held picture hangs from;
- *  - four columns from 1400px; between 600px and that, the name with the other two cells as a
- *    pair of lines beside it; on a phone, the name with its year, then the other cells under it.
+ *    (`data-biro="preview"`, `data-biro-place="gap"`): the held picture stays inside the row,
+ *    in the free stretch between the name and the cells, and covers no other row;
+ *  - from 600px the name with the other two cells as a pair of lines beside it; on a phone, the
+ *    name with its year, then the other cells under it.
  */
 
 /** Rows of one part arrive one after another; the theme's stagger is 75 ms a step. */
@@ -51,6 +52,7 @@ export function LineUp() {
                   {...(row.preview
                     ? {
                         "data-biro": "preview",
+                        "data-biro-place": "gap",
                         "data-biro-src": row.preview.src,
                         "data-biro-alt": row.preview.alt,
                         "data-biro-ratio": `${row.preview.width} / ${row.preview.height}`,
@@ -58,7 +60,8 @@ export function LineUp() {
                     : {})}
                 >
                   <span className="lineup__label">{row.name}</span>
-                  <span className="sr-only">, {LIST.goes[row.linkKind]}</span>
+                  {/* Also the far end of the stretch the held picture may take (site.css, `.lineup__goes`). */}
+                  <span className="sr-only lineup__goes">, {LIST.goes[row.linkKind]}</span>
                 </a>
               </th>
               <td className="lineup__what" role="cell">

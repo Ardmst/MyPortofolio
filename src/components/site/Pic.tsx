@@ -4,6 +4,8 @@ interface PicProps {
   picture: Picture;
   /** `sizes` for the `srcset`, when the picture has smaller renditions. */
   sizes?: string;
+  /** Media query under which the picture's landscape crop (`picture.wide`) is shown instead. */
+  wideFrom?: string;
   /** Only for the first picture of the page: loaded at once, with high priority. */
   eager?: boolean;
   className?: string;
@@ -17,24 +19,36 @@ interface PicProps {
  * shifts while it loads. The files are already cropped and sized by
  * `scripts/pictures.mjs`; no optimiser runs at request time.
  */
-export function Pic({ picture, sizes, eager = false, className, decorative = false }: PicProps) {
+export function Pic({ picture, sizes, wideFrom, eager = false, className, decorative = false }: PicProps) {
   const srcSet = picture.smaller
     ? [...picture.smaller, picture].map((file) => `${file.src} ${file.width}w`).join(", ")
     : undefined;
 
+  const img = (
+    <img
+      src={picture.src}
+      srcSet={srcSet}
+      sizes={srcSet ? sizes : undefined}
+      width={picture.width}
+      height={picture.height}
+      alt={decorative ? "" : picture.alt}
+      loading={eager ? "eager" : "lazy"}
+      fetchPriority={eager ? "high" : undefined}
+      decoding="async"
+    />
+  );
+
   return (
     <div className={["pic", picture.pixel ? "pic--pixel" : "", className ?? ""].filter(Boolean).join(" ")}>
-      <img
-        src={picture.src}
-        srcSet={srcSet}
-        sizes={srcSet ? sizes : undefined}
-        width={picture.width}
-        height={picture.height}
-        alt={decorative ? "" : picture.alt}
-        loading={eager ? "eager" : "lazy"}
-        fetchPriority={eager ? "high" : undefined}
-        decoding="async"
-      />
+      {picture.wide && wideFrom ? (
+        // The frame is sized by the stylesheet in both cases, so the differing proportion shifts nothing.
+        <picture>
+          <source media={wideFrom} srcSet={picture.wide.src} width={picture.wide.width} height={picture.wide.height} />
+          {img}
+        </picture>
+      ) : (
+        img
+      )}
     </div>
   );
 }

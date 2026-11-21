@@ -8,8 +8,9 @@
  * Colour: the "Sheet and biro" proportions (one ground, one ink, one accent) in the owner's colours:
  * white first, Gemini-style blues second (a strong blue for actions, a light sky blue for fields). Flat, no gradients.
  *
- * Fonts are loaded with next/font/google and exposed as --font-display and --font-text
- * on <html> (see DESIGN.md §3).
+ * Fonts are loaded with next/font and exposed as --font-display and --font-text on <html>.
+ * The recipe (Bebas Neue as a local font with its line box cut to the capitals) is in
+ * README.md, "Fonts": the fitted name below is measured against that face.
  */
 
 :root {
@@ -45,6 +46,14 @@
   --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);       /* 20–26px  supporting line, table cells */
   --step-head: clamp(2.5rem, 1.2rem + 5vw, 5.5rem);            /* 40–88px  section headings, display rows */
   --step-monument: clamp(7rem, 31vw, 34rem);                   /* the name; tuned so ARDMST fills ~94% of the width in Bebas Neue */
+
+  /*
+   * ARDMST in Bebas Neue at -0.035em, measured from the drawn glyphs: the ink starts
+   * 0.0125em inside the line box and is 2.285em wide. A name fitted to a box is sized
+   * box width / --name-fit and pulled left by --name-left, so its ink runs edge to edge.
+   */
+  --name-fit: 2.285;
+  --name-left: 0.0125em;
 
   --lead-display: 0.85;
   --track-display: -0.02em;
@@ -82,7 +91,7 @@
   --bloom-3: #284777;
   --field-1: #0a2a66;          /* dark stays dark: the close is the deep blue field, never white */
   --field-1-ink: #e8f0fe;
-  --field-1-soft: #8ab4f8;
+  --field-1-soft: #6f8fc9;     /* duller than the field's ink, so the dropped letters recede (4.2:1) */
   --dot: rgba(227, 227, 227, 0.18);
   color-scheme: dark;
 }
@@ -124,6 +133,19 @@ table { border-collapse: collapse; }
 :focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 3px;
+}
+
+/* Text for assistive technology only. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ---- type roles ---------------------------------------------------------- */
@@ -200,6 +222,18 @@ h2, .head { font-size: var(--step-head); }
 }
 .bar a { text-decoration: none; }
 .bar a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+/*
+ * Each word in the bar is a 44px target to the hand. The padding is taken back by an equal
+ * negative margin, so nothing moves; the focus ring is drawn inside the target, clear of the
+ * top edge of the screen.
+ */
+.bar a,
+.bar__theme {
+  padding: 0.75rem 0.5rem;
+  margin: -0.75rem -0.5rem;
+}
+.bar a:focus-visible,
+.bar__theme:focus-visible { outline-offset: -3px; }
 .bar__mark { font-weight: 500; }
 .bar__links { display: flex; gap: clamp(1rem, 2.4vw, 2.25rem); }
 
@@ -233,12 +267,21 @@ h2, .head { font-size: var(--step-head); }
 .bar__theme {
   background: none;
   border: 0;
-  padding: 0;
   cursor: pointer;
   font: inherit;
   color: inherit;
 }
 .bar__theme:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+/*
+ * Both words are in the markup and the theme shows one, so the word is right before any
+ * script runs and the button's name is always the word on screen:
+ * <button class="bar__theme" type="button" data-theme-toggle>
+ *   <span class="bar__to-dark">Dark</span><span class="bar__to-light">Light</span>
+ * </button>
+ */
+.bar__to-light,
+:root[data-theme="dark"] .bar__to-dark { display: none; }
+:root[data-theme="dark"] .bar__to-light { display: inline; }
 .button--paper { background: var(--bg); color: var(--ink); }
 .button--paper:hover { background: var(--surface); }
 
@@ -273,11 +316,29 @@ h2, .head { font-size: var(--step-head); }
 a.row:hover,
 a.row:focus-visible { background: var(--sky); color: var(--sky-ink); padding-left: calc(var(--margin) * 2); }
 
-/* ---- the close: invitation over the cropped name --------------------------- */
+/* ---- the close: invitation over the cropped name ---------------------------
+ * The same footer on both sites, complete here:
+ *
+ * <footer class="close" data-biro-ink="var(--field-1-ink)">
+ *   <div class="close__top">
+ *     <div class="close__ask">
+ *       <h2 class="close__say" data-rise>…</h2>
+ *       <a class="button" data-biro-ink="var(--field-1)" data-rise>…</a>
+ *     </div>
+ *     <ul class="close__links"><li data-rise><a>…</a></li>…</ul>
+ *   </div>
+ *   <div class="close__foot">
+ *     <p class="close__derive" data-rise>ARD<span class="close__drop">I</span> M…</p>
+ *     <div class="close__legal"><span>…</span><span>…</span></div>
+ *     <p class="monument" aria-hidden="true">ARDMST</p>
+ *   </div>
+ * </footer>
+ */
 
 .close {
   position: relative;
   overflow: hidden;
+  overflow: clip;   /* clip where it exists: a hidden box would become the scroller the name's timeline watches */
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -286,19 +347,84 @@ a.row:focus-visible { background: var(--sky); color: var(--sky-ink); padding-lef
   color: var(--field-1-ink);
   padding-top: clamp(4rem, 9vw, 9rem);
 }
+/* The accent is too close to the field in the light theme (2.6:1): the ring takes the field's ink. */
+.close :focus-visible { outline-color: var(--field-1-ink); }
+
+.close__top {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  row-gap: 2.5rem;
+  padding-inline: var(--margin);
+}
+.close__ask {
+  grid-column: 1 / span 8;
+  display: grid;
+  gap: clamp(1.5rem, 2.4vw, 2.25rem);
+  justify-items: start;
+}
+.close__say { max-width: 10.5em; }
+
+/* On the field the one button takes the field's own ink: light on the dark close, in both themes. */
+.close .button {
+  background: var(--field-1-ink);
+  color: var(--field-1);
+}
+.close .button:hover { background: var(--bloom-2); }
+
+.close__links {
+  grid-column: 10 / -1;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+}
+/* each link is 44px tall to the hand; the lines still read as a tight stack */
+.close__links a {
+  display: inline-block;
+  padding-block: 0.7rem;
+  margin-block: -0.35rem;
+  text-decoration: underline;
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-thickness var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+}
+.close__links a:hover { text-decoration-thickness: 0.14em; }
+.close__links a:active { opacity: 0.6; }
+
+.close__foot {
+  container-type: inline-size;
+  margin-top: clamp(3rem, 7vw, 6.5rem);
+}
+
+/* ARDI MUSTAQIM at the heading size: the letters the handle dropped are in the soft ink. */
+.close__derive {
+  padding-inline: var(--margin);
+  font-family: var(--font-display), "Bebas Neue", "Arial Narrow", Impact, sans-serif;
+  font-size: var(--step-head);
+  line-height: var(--lead-display);
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.close__drop { color: var(--field-1-soft); }
+
 .close__legal {
   display: flex;
   justify-content: space-between;
   gap: var(--gap);
+  margin-top: 0.9rem;
   padding-inline: var(--margin);
   font-size: var(--step-small);
 }
+
+/*
+ * The cropped name, fitted to the width by measurement and cut by the bottom edge: its
+ * box ends 0.5em below the cap line, so about seven tenths of each letter shows.
+ * Without container units the theme's own size stands.
+ */
 .close .monument {
-  /* heavier than the viewport can hold: the bottom edge cuts the letters */
-  font-size: clamp(8rem, 36vw, 40rem);
-  transform: translateY(24%);
-  margin-left: calc(var(--margin) * 0.6);
-  margin-top: 0.06em;
+  font-size: calc((100cqw - 2 * var(--margin)) / var(--name-fit));
+  margin: clamp(0.9rem, 1.6vw, 1.5rem) 0 -0.3em calc(var(--margin) - var(--name-left));
 }
 
 /* ---- motion: entrances. Content is visible without script. ----------------- */
@@ -311,6 +437,32 @@ a.row:focus-visible { background: var(--sky); color: var(--sky-ink); padding-lef
 }
 .js [data-rise].is-in { opacity: 1; transform: none; }
 
+@keyframes close-name-up { from { translate: 0 16%; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The derivation: the whole name arrives, then the letters the handle dropped fall back. */
+  .js .close__derive[data-rise] .close__drop {
+    color: inherit;
+    transition: color 700ms ease 450ms;
+  }
+  .js .close__derive[data-rise].is-in .close__drop { color: var(--field-1-soft); }
+}
+
+/*
+ * The cropped name comes up to its place as the close enters, on the compositor, where the
+ * browser has view timelines. Its box runs 0.3em past the end of the page, so it is never
+ * more than 62% in view: the move ends at 60%.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .close .monument {
+      animation: close-name-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js [data-rise] { opacity: 1; transform: none; transition: none; }
@@ -321,11 +473,27 @@ a.row:focus-visible { background: var(--sky); color: var(--sky-ink); padding-lef
   }
 }
 
-/* ---- phone ----------------------------------------------------------------- */
+/* ---- upright screens and phones -------------------------------------------- */
+
+/* The close is as tall as what it holds: a full upright screen of it would be mostly empty field. */
+@media (max-width: 720px), (orientation: portrait) {
+  .close { min-height: 0; }
+}
 
 @media (max-width: 720px) {
   .bar__links { gap: 1rem; }
   .row { flex-direction: column; align-items: flex-start; gap: 0.35rem; }
   .row__note { text-align: left; max-width: none; }
+
+  .close__foot { margin-top: 4.5rem; }
+  .close__ask,
+  .close__links { grid-column: 1 / -1; }
+  .close__ask .button { width: 100%; }
+  .close__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+  }
+  .close__links a { margin-block: 0; }
   .close__legal { flex-direction: column; gap: 0.25rem; }
 }

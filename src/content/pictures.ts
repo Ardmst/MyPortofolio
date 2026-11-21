@@ -16,6 +16,8 @@ export interface Picture {
   alt: string;
   /** Smaller renditions of the same crop, for `srcset`. */
   smaller?: { src: string; width: number }[];
+  /** A landscape crop of the same source, for a slot that is wider than tall on a wide screen. */
+  wide?: { src: string; width: number; height: number };
   /** Pixel art that may be enlarged: keep its pixels square. */
   pixel?: boolean;
 }
@@ -28,6 +30,7 @@ export const PICTURES = {
       height: 1140,
       alt: "Rifkhi Ardi Mustaqim, a black-and-white portrait under trees",
       smaller: [{ src: "/work/hero/portrait-480.webp", width: 480 }],
+      wide: { src: "/work/hero/portrait-wide.webp", width: 920, height: 690 },
     },
     keyart: {
       src: "/work/hero/keyart-800.webp",
@@ -35,13 +38,15 @@ export const PICTURES = {
       height: 1200,
       alt: "Detektif Ekosistem key art: two pixel-art detectives at the edge of a burning forest",
       smaller: [{ src: "/work/hero/keyart-480.webp", width: 480 }],
+      wide: { src: "/work/hero/keyart-wide.webp", width: 960, height: 720 },
     },
     standings: {
       src: "/work/hero/standings-712.webp",
       width: 712,
       height: 1068,
-      alt: "KicauScore on a phone: the live standings of the Murai Batu VIP 36G category, first and second place",
+      alt: "KicauScore on a phone: the live standings of the Murai Batu VIP 36G category, from the top",
       smaller: [{ src: "/work/hero/standings-480.webp", width: 480 }],
+      wide: { src: "/work/hero/standings-wide.webp", width: 780, height: 585 },
     },
     burntLand: {
       src: "/work/hero/burnt-land-800.webp",
@@ -49,13 +54,7 @@ export const PICTURES = {
       height: 1200,
       alt: "The second map of Detektif Ekosistem from above: burnt ground and dead trees around a village",
       smaller: [{ src: "/work/hero/burnt-land-480.webp", width: 480 }],
-    },
-    birdProfile: {
-      src: "/work/hero/bird-profile-780.webp",
-      width: 780,
-      height: 1170,
-      alt: "KicauScore on a phone: the profile page of a bird called Halilintar, with its owner and ring number",
-      smaller: [{ src: "/work/hero/bird-profile-480.webp", width: 480 }],
+      wide: { src: "/work/hero/burnt-land-wide.webp", width: 880, height: 660 },
     },
   },
 

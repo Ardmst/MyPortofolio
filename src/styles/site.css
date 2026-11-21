@@ -6,8 +6,8 @@
  *  - Colours, type sizes, spacing and easing come from theme.css tokens. The few tokens this
  *    site adds are in the first block below; nothing else in this file holds a raw value.
  *  - One block per component, BEM-like: .hero / .work / .project / .stage / .shot / .standings /
- *    .play / .about / .lineup / .contact / .close (the field of the close is in theme.css), then
- *    the motion that goes beyond the theme's rise.
+ *    .play / .about / .lineup / .contact, then the motion that goes beyond the theme's rise.
+ *    The close (the footer) is whole in theme.css: this site adds no rule to it.
  *  - No section sets a background of the page ground: the dot sheet shows wherever there is none.
  *  - Wide layout from 900px. Below that every section has a phone composition of its own.
  *  - Motion: transform, opacity and clip-path only; entrances are `data-rise` (theme.css + the kit),
@@ -23,40 +23,62 @@
   /* The bar's height: its padding and its one line, as theme.css sets them on .bar. */
   --bar-h: calc(2 * clamp(0.9rem, 1.6vw, 1.5rem) + 1.2 * var(--step-body));
 
+  /* One hundredth of the screen's height: the small viewport where the browser knows it (below). */
+  --svh: 1vh;
+
   /*
-   * The hero. Its monument is sized by the width (ARDMST is 2.27em wide, so 40vw fills
-   * the measure) and capped by the height, because it is pinned and shares the screen with
-   * the portraits. In Bebas Neue with line-height 0.8 the capitals take the top 0.7em of the
-   * line box; the band ends 0.04em under their feet.
+   * The hero. Its monument is fitted to the width by measurement (theme.css, --name-fit): the
+   * ink runs from margin to margin. It is pinned and shares the screen with the sheets under it,
+   * so on a wide, short screen the height sets the size instead (68% of it at most) and the
+   * letters are set apart to keep the ink on both margins (.hero__name); never under two thirds
+   * of the fitted size. In Bebas Neue the capitals take the top 0.7em of the 0.8em line; the
+   * band ends 0.04em under their feet.
    */
-  --hero-f: min(40vw, 61vh);
+  --hero-w: calc(100vw - 2 * var(--margin));                    /* the measure: the screen less the margins */
+  --hero-f: clamp(var(--hero-w) / 3.4, 68 * var(--svh), var(--hero-w) / var(--name-fit));
   --hero-air: 0.75rem;                                          /* above the letters while pinned */
   --hero-band: calc(var(--bar-h) + var(--hero-f) * 0.74);       /* the band at rest: bar + name */
   --hero-lintel: calc(var(--hero-air) + var(--hero-f) * 0.74);  /* its lower edge once pinned */
-  --hero-leaf: min(100vh - var(--hero-band), 74vh);             /* the first sheet: the rest of the first screen */
-  --hero-sheet: min(100vh - var(--hero-lintel), 74vh);          /* every later sheet: all the room under the pinned band */
+  --hero-leaf: min(100 * var(--svh) - var(--hero-band), 74 * var(--svh));     /* the first sheet: the rest of the first screen */
+  --hero-sheet: min(100 * var(--svh) - var(--hero-lintel), 66 * var(--svh));  /* every later sheet: the room under the pinned band */
   --hero-pad: clamp(0.5rem, 1vw, 0.875rem);
+  --hero-foot: clamp(1rem, 1.8vw, 1.6rem);                      /* what stands at the foot of a wide sheet, above the fold */
+  --hero-fig: calc(var(--hero-w) * 0.42);                       /* the picture of a wide sheet */
   --hero-cap: calc(var(--step-small) * 1.4 + 0.6rem);           /* a caption line and its gap */
   --hero-say: 12.5rem;                                          /* sentence + button above the first portrait on narrow screens */
 }
 
 @supports (height: 1svh) {
-  :root {
-    --hero-f: min(40vw, 61svh);
-    --hero-leaf: min(100svh - var(--hero-band), 74svh);
-    --hero-sheet: min(100svh - var(--hero-lintel), 74svh);
-  }
+  :root { --svh: 1svh; }
+}
+
+/*
+ * 100vw counts a classic scrollbar, so a name fitted to it would overrun the right margin by the
+ * scrollbar's width. Where container units exist the measure is the page's own width instead.
+ */
+@supports (width: 1cqw) {
+  main { container-type: inline-size; }
+  :root { --hero-w: calc(100cqw - 2 * var(--margin)); }
 }
 
 /* ---- small things ---------------------------------------------------------------------------------- */
 
-.sr-only {
+/* The first tab stop of every page: it shows only while it has the focus. */
+.skip {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  padding: 0.9rem 1.2rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  text-decoration: none;
+  transform: translateY(-110%);
+}
+.skip:focus-visible {
+  transform: none;
+  outline-offset: -6px;
+  outline-color: var(--accent-ink);
 }
 
 /* A text link that is a button (Restart). */
@@ -75,6 +97,13 @@ button.link {
   .if-keys { display: none !important; }
 }
 
+/* A control that only script can work is not offered without it (the boot script sets .js). */
+html:not(.js) .needs-js { display: none !important; }
+
+/* A landscape crop inside a frame (Pic): the frame's rules reach through the <picture>. */
+.pic > picture { display: contents; }
+.pic > picture > img { width: 100%; height: 100%; object-fit: cover; }
+
 /* ---- hero: pinned title over portraits ------------------------------------------------------------- */
 
 .hero { position: relative; }
@@ -82,14 +111,19 @@ button.link {
 /* The band the monument stands on. It takes the ground and ink of the sheet that has docked. */
 .hero__band {
   height: var(--hero-band);
-  padding-top: var(--bar-h);
+  padding: var(--bar-h) var(--margin) 0;
   background: var(--hero-ground, transparent);
   color: var(--hero-ink, inherit);
-  text-align: center;
 }
+/*
+ * The name from margin to margin. Six letters have five gaps and the fitted width already
+ * holds five of -0.035em, hence (fit + 0.175): at the fitted size this is the theme's own
+ * tracking, and where the height holds the size down the gaps open by what is left over.
+ */
 .hero__name {
   font-size: var(--hero-f);
-  padding-right: 0.035em;   /* the last letter's tracking, so the ink is centred */
+  letter-spacing: calc((var(--hero-w) - (var(--name-fit) + 0.175) * var(--hero-f)) / 5);
+  margin-left: calc(-1 * var(--name-left));
 }
 
 .hero[data-step="1"] { --hero-ground: var(--g1); --hero-ink: var(--i1); }
@@ -100,7 +134,16 @@ button.link {
 .hero[data-step="6"] { --hero-ground: var(--g6); --hero-ink: var(--i6); }
 .hero[data-step="7"] { --hero-ground: var(--g7); --hero-ink: var(--i7); }
 
-/* One sheet: a portrait and its caption on a flat ground. Stacked, unless the hero is pinned (below). */
+/*
+ * One sheet: a picture and its caption on a flat ground.
+ *
+ * Narrow (the base, under 900px): the whole 2:3 portrait with its caption under it, centred;
+ * on the first sheet the sentence and the button stand above the portrait.
+ * Wide: under the name there is less room than a 2:3 portrait needs, so the picture is a
+ * landscape crop of the same source, 42% of the measure wide, standing on the fold with the
+ * caption at the left foot of the sheet. The first sheet has the sentence there and the button
+ * at the right foot.
+ */
 .hero__leaf {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -125,28 +168,7 @@ button.link {
 }
 .hero__cap { text-align: center; }
 
-@media (min-width: 900px) {
-  /* First sheet: the sentence at the left foot, the portrait in the middle, the button at the right foot. */
-  .hero__leaf--first {
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    column-gap: var(--gap);
-    align-items: end;
-    justify-items: stretch;
-  }
-  .hero__leaf--first .hero__say {
-    grid-area: 1 / 1;
-    max-width: 26ch;
-    margin-bottom: var(--hero-cap);
-  }
-  .hero__leaf--first .hero__fig { grid-area: 1 / 2; }
-  .hero__leaf--first .hero__go {
-    grid-area: 1 / 3;
-    justify-self: end;
-    margin-bottom: var(--hero-cap);
-  }
-}
-
-/* How tall a sheet is and how tall its portrait may be (used below, wherever a sheet has a set height). */
+/* How tall a sheet is and how tall its portrait may be (wherever a sheet has a set height). */
 .hero__leaf {
   --hero-h: var(--hero-sheet);
   --hero-pic: calc(var(--hero-h) - 2 * var(--hero-pad) - var(--hero-cap));
@@ -155,13 +177,10 @@ button.link {
   --hero-h: var(--hero-leaf);
   --hero-pic: calc(var(--hero-h) - 2 * var(--hero-pad) - var(--hero-cap) - var(--hero-say));
 }
-@media (min-width: 900px) {
-  .hero__leaf--first { --hero-pic: calc(var(--hero-h) - 2 * var(--hero-pad) - var(--hero-cap)); }
-}
 
-/* The first sheet fills the rest of the first screen in every mode, so the sentence, the button
-   and the whole portrait are there without scrolling, pinned or not. */
-@media (min-height: 560px) {
+/* Narrow: the first sheet fills the rest of the first screen in every mode, so the sentence, the
+   button and the whole portrait are there without scrolling, pinned or not. */
+@media (max-width: 899px) and (min-height: 560px) {
   .hero__leaf--first {
     min-height: var(--hero-h);
     padding-block: var(--hero-pad);
@@ -169,7 +188,64 @@ button.link {
   }
   .hero__leaf--first .hero__pic {
     width: auto;
-    height: min(var(--hero-pic), calc((100vw - 2 * var(--margin)) * 1.5));
+    height: min(var(--hero-pic), var(--hero-w) * 1.5);
+  }
+}
+
+/* Wide: every sheet has its height in every mode, pinned or not. */
+@media (min-width: 900px) and (min-height: 560px) {
+  .hero__leaf,
+  .hero__fig {
+    grid-template-columns: minmax(0, 1fr) var(--hero-fig) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);   /* one row, as tall as the sheet: everything stands on its foot */
+    column-gap: var(--gap);
+    row-gap: 0;
+    align-items: end;
+    justify-items: stretch;
+  }
+  .hero__leaf {
+    height: var(--hero-h);
+    padding: var(--hero-pad) var(--margin) 0;
+  }
+  .hero__fig {
+    grid-area: 1 / 1 / 2 / -1;
+    justify-self: stretch;
+    height: 100%;
+  }
+  .hero__pic {
+    grid-area: 1 / 2;
+    width: 100%;
+    height: min(100%, var(--hero-fig) * 1.5);
+    aspect-ratio: auto;
+  }
+  .hero__cap {
+    grid-area: 1 / 1;
+    margin-bottom: var(--hero-foot);
+    text-align: left;
+  }
+  .hero__leaf--first .hero__say,
+  .hero__leaf--first .hero__go {
+    position: relative;   /* over the figure, whose box spans the sheet */
+    z-index: 1;
+    margin-bottom: var(--hero-foot);
+  }
+  .hero__leaf--first .hero__say {
+    grid-area: 1 / 1;
+    max-width: 26ch;
+  }
+  .hero__leaf--first .hero__go {
+    grid-area: 1 / 3;
+    justify-self: end;
+  }
+  /* The sentence beside the portrait begins with his name: the caption is for screen readers there. */
+  .hero__leaf--first .hero__cap {
+    position: absolute;
+    width: 1px;
+    height: 1px;   /* taste-skill-ignore: a visually hidden caption (as .sr-only), not a drawn line */
+    margin: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
 
@@ -194,14 +270,18 @@ button.link {
   .js .hero__leaf {
     position: sticky;
     top: var(--hero-lintel);
+  }
+  .js .hero__leaf[data-under] { visibility: hidden; }   /* fully covered by the sheet above */
+}
+@media (prefers-reduced-motion: no-preference) and (min-height: 560px) and (max-width: 899px) {
+  .js .hero__leaf {
     height: var(--hero-h);
     padding-block: var(--hero-pad);
     align-content: start;
   }
-  .js .hero__leaf[data-under] { visibility: hidden; }   /* fully covered by the sheet above */
   .js .hero__pic {
     width: auto;
-    height: min(var(--hero-pic), calc((100vw - 2 * var(--margin)) * 1.5));
+    height: min(var(--hero-pic), var(--hero-w) * 1.5);
   }
 }
 
@@ -209,9 +289,9 @@ button.link {
 @media (prefers-reduced-motion: no-preference) {
   .hero__say,
   .hero__go,
-  .hero__leaf--first .hero__fig { animation: hero-in 720ms var(--ease) backwards; }
+  .hero__leaf--first .hero__pic { animation: hero-in 720ms var(--ease) backwards; }
   .hero__go { animation-delay: 90ms; }
-  .hero__leaf--first .hero__fig { animation-delay: 180ms; }
+  .hero__leaf--first .hero__pic { animation-delay: 180ms; }
   /* the one moving photograph of the first screen: the portrait settles slowly into its frame */
   .hero__leaf--first .hero__pic img { animation: hero-settle 2400ms var(--ease) backwards; }
 }
@@ -344,6 +424,9 @@ button.link {
   }
 
   .project:nth-of-type(3n + 2) .project__visual { grid-column: 1 / span 7; }
+  /* its cluster hangs from the top of the visual: the block above ends with its action in this
+     column, so the column is never empty for long between two blocks */
+  .project:nth-of-type(3n + 2) .project__cluster { align-self: start; }
   .project:nth-of-type(3n + 2) .project__text { grid-column: 1 / span 4; }
   .project:nth-of-type(3n + 2) .project__aside { grid-column: 5 / span 3; }
 
@@ -400,6 +483,13 @@ button.stage__still:focus-visible { outline-offset: -6px; }
   button.stage__still:hover > * { transform: scale(1.025); }
 }
 button.stage__still:active > * { transform: scale(1.01); transition-duration: var(--dur-fast); }
+/* The loop lies over the resting picture and shows nothing until it plays. */
+.stage__still > .stage__clip {
+  position: absolute;
+  inset: 0;
+}
+/* Without script a browser gives the loop its own black box and controls: the picture stands alone. */
+html:not(.js) .stage__clip { display: none; }
 .stage__frame {
   position: absolute;
   inset: 0;
@@ -471,13 +561,19 @@ button.stage__still:active > * { transform: scale(1.01); transition-duration: va
   font-variant-numeric: tabular-nums lining-nums;
 }
 .standings th { font-weight: 500; }
-.standings td { border-top: 1px solid color-mix(in srgb, var(--field-kicau) 20%, transparent); }
+.standings td { border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent); }
 .standings th:last-child,
 .standings td:last-child { padding-right: 0; }
 .standings .standings__num { text-align: right; }
 .standings td:nth-child(3) { white-space: nowrap; }
 .standings__owner { display: block; opacity: 0.78; }
 .standings figcaption { margin-top: 0.55rem; }
+/* In the dark theme the mint would be the brightest block of the page: the table takes the
+   project's dark green instead, with the mint as its ink. */
+:root[data-theme="dark"] .standings {
+  background: var(--field-kicau);
+  color: var(--field-mint);
+}
 
 /* ---- /play/detektif ---------------------------------------------------------------------------------- */
 
@@ -623,10 +719,11 @@ button.stage__still:active > * { transform: scale(1.01); transition-duration: va
  *    lie over the link and let the pointer through;
  *  - narrow (the base): an entry is the name with its year, then what it is, then what it was
  *    built with, in the soft ink;
- *  - from 600px: the name on the margin, the other two as a pair of lines from column 6;
- *  - from 1400px: four columns at one size, each starting on a fixed column line (1, 4 and 8),
- *    the year against the far margin. The text of the section above hangs from the same
- *    second line.
+ *  - from 600px: the name on the margin, what it is with what it was built with under it from
+ *    column 6, the year against the far margin;
+ *  - the held picture of a linked row stays inside that row (sheet kit, data-biro-place="gap"):
+ *    it is as tall as the row and lives in the free stretch between the name and column 6, so
+ *    it never covers another row. Where there is a mouse the linked rows are taller for it.
  */
 .lineup {
   --lineup-soft: var(--sky-ink);
@@ -700,6 +797,7 @@ button.stage__still:active > * { transform: scale(1.01); transition-duration: va
   padding-top: 0;
 }
 .lineup__row--link .lineup__name a {
+  position: relative;
   display: block;
   height: 100%;
   margin-inline: calc(-1 * var(--margin));
@@ -770,29 +868,20 @@ button.stage__still:active > * { transform: scale(1.01); transition-duration: va
   }
 }
 
-/* From 1400px, where the longest cells fit on a line: four columns. */
-@media (min-width: 1400px) {
-  .lineup__row { --pad: 0.32em; }
-  .lineup__name {
-    grid-column: 1 / span 3;
-    grid-row: 1;
+/*
+ * The held picture. The sheet kit opens it in the widest stretch between what the link's two
+ * children hold: the name, and the words for screen readers after it. Those words are parked
+ * (still one pixel, still unseen) where column 6 begins, so the stretch ends there, short of the
+ * other cells.
+ */
+@media (min-width: 600px) {
+  .lineup__goes {
+    top: 0;
+    left: calc(var(--margin) + (100% - 2 * var(--margin) - 11 * var(--gap)) / 12 * 5 + 5 * var(--gap));
   }
-  .lineup__what {
-    grid-column: 4 / span 4;
-    padding-bottom: var(--pad);
-  }
-  .lineup__with {
-    grid-column: 8 / span 4;
-    grid-row: 1;
-    padding-block: var(--pad);
-    font-size: inherit;
-    line-height: inherit;
-    color: inherit;
-  }
-  .lineup__with--wide { grid-column: 8 / -1; }
-  .lineup__row--link .lineup__name { grid-row: 1; }
-  /* the width of three columns */
-  .lineup__row--link .lineup__label { width: calc((100% - 11 * var(--gap)) / 4 + 2 * var(--gap)); }
+}
+@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+  .lineup__row--link { --pad: 1.4em; }
 }
 
 /* ---- contact: address in display rows -------------------------------------------------------------- */
@@ -861,104 +950,13 @@ button.stage__still:active > * { transform: scale(1.01); transition-duration: va
   }
 }
 
-/* ---- the close: invitation over the cropped name --------------------------------------------------- */
-
-/*
- * theme.css gives the field, the legal row and the cropped name (.close). Here: the invitation
- * with its button and the links (top), and the name the handle comes from (foot).
- * Narrow: one column, the links as lines a thumb can hit. From 600px: the invitation on the
- * left (columns 1 to 9, then 1 to 7), the links on the last three, top-aligned with it.
- */
-.close__top {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  row-gap: clamp(1.5rem, 4vw, 2.5rem);
-  padding-inline: var(--margin);
-}
-.close__say { max-width: 9.6em; }
-.close__act { margin-top: clamp(1.5rem, 2.6vw, 2.25rem); }
-.close__go { width: 100%; }
-.close__links { display: grid; }
-.close__links a {
-  display: flex;
-  align-items: center;
-  min-height: 2.75rem;
-  font-size: var(--step-lead);
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-decoration-thickness: 0.06em;
-  text-underline-offset: 0.2em;
-  transition: text-decoration-color var(--dur-fast) var(--ease);
-}
-.close__links a:hover,
-.close__links a:focus-visible { text-decoration-color: currentColor; }
-
-.close__foot { margin-top: clamp(3rem, 9vw, 7rem); }
-/*
- * theme.css makes the close at least one screen tall. On a wide screen its content fills that;
- * on an upright one (a phone, a tablet held upright) it leaves a third of the screen empty between
- * the links and the name, so there the close is as tall as what it holds.
- */
-@media (orientation: portrait) {
-  .close { min-height: 0; }
-  .close__foot { margin-top: clamp(4.5rem, 20vw, 9rem); }
-}
-.close__derive {
-  padding-inline: var(--margin);
-  margin-bottom: clamp(0.6rem, 1.2vw, 1rem);
-  font-family: var(--font-display), "Bebas Neue", "Arial Narrow", Impact, sans-serif;
-  font-size: var(--step-head);
-  line-height: var(--lead-display);
-  letter-spacing: var(--track-display);
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.close__drop { color: var(--field-1-soft); }
-/*
- * theme.css pushes the cropped name down by 24% of its line (0.19em of its size, repeated here
- * from .close .monument), which leaves that much empty ground over its capitals. The legal row
- * takes it back, so it stands directly on the name. The name's letters are far taller than their
- * line (their boxes reach up over these two lines without painting there), so both lines are
- * raised above them: they stay selectable.
- */
-.close__derive,
-.close__legal {
-  position: relative;
-  z-index: 1;
-}
-.close__legal { margin-bottom: calc(clamp(8rem, 36vw, 40rem) * -0.19); }
-
-@media (min-width: 600px) {
-  .close__top {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gap);
-    align-items: start;
-  }
-  .close__ask { grid-column: 1 / span 9; }
-  .close__go { width: auto; }
-  .close__links {
-    grid-column: 10 / -1;
-    row-gap: 0.15rem;
-  }
-  .close__links a {
-    min-height: 0;
-    padding-block: 0.2rem;
-    font-size: var(--step-body);
-  }
-}
-@media (min-width: 900px) {
-  .close__ask { grid-column: 1 / span 7; }
-}
-
 /* ---- motion: what moves beyond the theme's rise ---------------------------------------------------- */
 
 /*
  * theme.css gives every [data-rise] one entrance (it rises 24px as it fades in, staggered).
- * Two things arrive in their own way:
- *  - pictures open: what a [data-rise="open"] holds is uncovered from its top edge while the
- *    picture inside settles from a slight enlargement;
- *  - the name in the close arrives whole, then the letters the handle drops go pale.
- * Transform, opacity, clip-path and colour only. Nothing here applies without script or under
+ * Pictures arrive in their own way: what a [data-rise="open"] holds is uncovered from its top
+ * edge while the picture inside settles from a slight enlargement. (The close's own motion is
+ * in theme.css.) Transform, opacity and clip-path only. Nothing here applies without script or under
  * reduced motion: the finished state is the resting one.
  *
  * Until it opens, the picture is hidden with opacity, not with the clip: a browser neither sees a
@@ -979,12 +977,6 @@ button.stage__still:active > * { transform: scale(1.01); transition-duration: va
   .js [data-rise="open"].is-in :is(img, video) {
     animation: settle 1500ms var(--ease) backwards;
     animation-delay: calc(var(--i, 0) * 75ms);
-  }
-
-  .js .close__drop { transition: color 900ms ease 650ms; }
-  .js .close__derive:not(.is-in) .close__drop {
-    color: inherit;
-    transition: none;
   }
 }
 @keyframes open { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0); } }

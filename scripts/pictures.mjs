@@ -30,7 +30,6 @@ const src = {
   stage3: path.join(MEDIA, "detektif", "detektif-14-stage3-burnt-west-rain.webp"),
   analysis: path.join(MEDIA, "detektif", "detektif-12-stage2-analysis-drone-termal.webp"),
   standingsPhone: path.join(MEDIA, "kicaumania", "kicaumania-scoreboard-live-mobile.webp"),
-  birdPhone: path.join(MEDIA, "kicaumania", "kicaumania-bird-profile-mobile.webp"),
   homePhone: path.join(MEDIA, "kicaumania", "kicaumania-home-mobile.webp"),
   standings: path.join(MEDIA, "kicaumania", "kicaumania-scoreboard-live-fullpage.webp"),
   home: path.join(MEDIA, "kicaumania", "kicaumania-home-desktop.webp"),
@@ -44,12 +43,16 @@ const src = {
  * when it is enlarged; everything else uses the default (Lanczos).
  */
 const jobs = [
-  // ---- hero portraits, 2:3, at two widths ---------------------------------
+  // ---- hero portraits: 2:3 at two widths for upright screens, and a 4:3 crop of the same
+  //      source for the wide frame a desktop shows under the pinned name -----------------
   { out: "hero/portrait", from: src.profile, crop: [120, 0, 760, 1140], sizes: [[480, 720], [760, 1140]], quality: 80 },
+  { out: "hero/portrait-wide", from: src.profile, crop: [0, 250, 1000, 750], sizes: [[920, 690]], quality: 72 },
   { out: "hero/keyart", from: src.keyart, crop: [150, 0, 480, 720], sizes: [[480, 720], [800, 1200]], quality: 84 },
+  { out: "hero/keyart-wide", from: src.keyart, crop: [40, 0, 960, 720], sizes: [[960, 720]], quality: 84 },
+  { out: "hero/burnt-land", from: src.map2, crop: [0, 0, 1067, 1600], sizes: [[480, 720], [800, 1200]], quality: 62 },
+  { out: "hero/burnt-land-wide", from: src.map2, crop: [0, 60, 1600, 1200], sizes: [[880, 660]], quality: 54 },
   { out: "hero/standings", from: src.standingsPhone, crop: [0, 620, 712, 1068], sizes: [[480, 720], [712, 1068]], quality: 82 },
-  { out: "hero/burnt-land", from: src.map2, crop: [0, 0, 1067, 1600], sizes: [[480, 720], [800, 1200]], quality: 76 },
-  { out: "hero/bird-profile", from: src.birdPhone, crop: [0, 0, 780, 1170], sizes: [[480, 720], [780, 1170]], quality: 82 },
+  { out: "hero/standings-wide", from: src.standingsPhone, crop: [0, 768, 780, 585], sizes: [[780, 585]], quality: 82 },
 
   // ---- Detektif Ekosistem ---------------------------------------------------
   // The stage poster is written by scripts/clip.mjs (the first frame of the loop).
