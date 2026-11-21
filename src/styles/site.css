@@ -889,8 +889,8 @@ html:not(.js) .stage__clip { display: none; }
 /*
  * The greeting row is the section's heading: two words at the display size and a round arrow
  * button that writes the mail. Under it every address is a row from theme.css (.rows / .row),
- * told apart by two flat tones; the first address row takes the pale one, so the greeting stands
- * on the sheet. On a phone the greeting is a band of the accent with the button at its far end.
+ * told apart by two flat tones, banded as the theme bands them (the same phase as the hub's
+ * doors). On a phone the greeting is a band of the accent with the button at its far end.
  */
 .contact { padding-top: calc(var(--section) / 2); }
 
@@ -928,12 +928,6 @@ html:not(.js) .stage__clip { display: none; }
 }
 
 .contact__rows { font-style: normal; }   /* an address is italic by default */
-.contact__rows .row:nth-child(odd) { background: var(--surface); }
-.contact__rows .row:nth-child(even) { background: transparent; }
-.contact__rows a.row:hover,
-.contact__rows a.row:focus-visible { background: var(--sky); }
-.contact__rows a.row:focus-visible { outline-offset: -3px; }
-.contact__rows a.row:active { background: var(--bloom-3); }
 
 @media (max-width: 720px) {
   .contact__hello {

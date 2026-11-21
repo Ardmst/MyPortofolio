@@ -315,6 +315,9 @@ h2, .head { font-size: var(--step-head); }
 .row__note { font-size: var(--step-body); text-align: right; max-width: 28ch; }
 a.row:hover,
 a.row:focus-visible { background: var(--sky); color: var(--sky-ink); padding-left: calc(var(--margin) * 2); }
+/* a row runs edge to edge: its focus ring is drawn inside it; pressed, it takes the deeper blue */
+a.row:focus-visible { outline-offset: -3px; }
+a.row:active { background: var(--bloom-3); }
 
 /* ---- the close: invitation over the cropped name ---------------------------
  * The same footer on both sites, complete here:
