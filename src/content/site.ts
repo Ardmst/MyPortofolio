@@ -80,7 +80,7 @@ export const HERO = {
     },
     {
       picture: PICTURES.hero.standings,
-      caption: "KicauScore, live standings (demo data)",
+      caption: "KicauScore, a contest page with its venue, date and categories",
       ground: "var(--field-kicau)",
       ink: "var(--on-field)",
       biroInk: "#fff",

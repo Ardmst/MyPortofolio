@@ -44,7 +44,7 @@ export const PICTURES = {
       src: "/work/hero/standings-712.webp",
       width: 712,
       height: 1068,
-      alt: "KicauScore on a phone: the live standings of the Murai Batu VIP 36G category, from the top",
+      alt: "KicauScore on a phone: a contest page showing its venue, date and the bird classes",
       smaller: [{ src: "/work/hero/standings-480.webp", width: 480 }],
       wide: { src: "/work/hero/standings-wide.webp", width: 780, height: 585 },
     },
