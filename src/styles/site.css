@@ -542,7 +542,7 @@ html:not(.js) .stage__clip { display: none; }
   width: calc(100% - calc(var(--margin) + 2px));
   max-width: none;
   height: auto;
-  border-radius: 12px 0 0 12px;
+  border-radius: 12px 0 0 0;
 }
 .shot--tall { aspect-ratio: 4 / 5; }
 .shot--tall > img { width: 84%; }
