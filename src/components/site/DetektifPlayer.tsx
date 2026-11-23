@@ -22,10 +22,32 @@ export function DetektifPlayer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const handleUnlockAudio = useCallback(() => {
+    try {
+      const frame = frameRef.current;
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.focus();
+        frame.contentWindow.postMessage("resume_audio", "*");
+        // @ts-ignore
+        if (frame.contentWindow.__resumeGodotAudio) {
+          // @ts-ignore
+          frame.contentWindow.__resumeGodotAudio();
+        }
+        // @ts-ignore
+        if (frame.contentWindow.GodotAudioContext) {
+          // @ts-ignore
+          frame.contentWindow.GodotAudioContext.resume().catch(() => {});
+        }
+      }
+      setAudioUnlocked(true);
+    } catch {}
+  }, []);
 
   // Auto-play video loop in view
   useEffect(() => {
@@ -47,8 +69,10 @@ export function DetektifPlayer({
     if (!isPlaying) {
       setIsPlaying(true);
       setIsLoading(true);
+      setTimeout(handleUnlockAudio, 500);
+      setTimeout(handleUnlockAudio, 1500);
     }
-  }, [isPlaying]);
+  }, [isPlaying, handleUnlockAudio]);
 
   const handleRestart = useCallback(() => {
     setRunKey((k) => k + 1);
@@ -146,6 +170,19 @@ export function DetektifPlayer({
 
             {/* Floating In-Game Controls */}
             <div className="detektif-float-controls">
+              <button
+                type="button"
+                className="detektif-pill-btn"
+                onClick={handleUnlockAudio}
+                title="Aktifkan / Pastikan Suara Game Nyala"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" strokeLinecap="round" />
+                </svg>
+                <span>{audioUnlocked ? "Suara Aktif" : "Aktifkan Suara"}</span>
+              </button>
+
               <button
                 type="button"
                 className="detektif-pill-btn"

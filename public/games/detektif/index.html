@@ -109,8 +109,8 @@ body {
 			<div id="status-notice"></div>
 		</div>
 
-		<div id="audio-hint" style="display:none; position:absolute; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(18,14,11,0.88); color:#f5efe6; padding:8px 18px; border-radius:24px; font-family:'Press Start 2P', monospace, sans-serif; font-size:11px; z-index:99; pointer-events:none; border:1px solid rgba(245,180,90,0.4); backdrop-filter:blur(6px); box-shadow:0 4px 16px rgba(0,0,0,0.6); letter-spacing:0.5px;">
-			🔊 Klik layar game untuk mengaktifkan audio
+		<div id="audio-hint" style="display:none; position:absolute; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(18,14,11,0.92); color:#f5efe6; padding:10px 22px; border-radius:24px; font-family:'Press Start 2P', monospace, sans-serif; font-size:11px; z-index:99; cursor:pointer; border:1px solid rgba(245,180,90,0.6); backdrop-filter:blur(6px); box-shadow:0 4px 16px rgba(0,0,0,0.6); letter-spacing:0.5px;">
+			🔊 Klik di sini / layar game untuk mengaktifkan audio
 		</div>
 
 		<script>
@@ -139,6 +139,9 @@ body {
 				allContexts.forEach(ctx => {
 					if (ctx && ctx.state === 'suspended') hasSuspended = true;
 				});
+				if (window.GodotAudioContext && window.GodotAudioContext.state === 'suspended') {
+					hasSuspended = true;
+				}
 				const status = document.getElementById('status');
 				const isEngineRunning = !status || status.style.visibility === 'hidden' || getComputedStyle(status).display === 'none';
 				if (hasSuspended && isEngineRunning) {
@@ -155,11 +158,19 @@ body {
 					}
 				});
 				try {
+					if (window.GodotAudioContext && window.GodotAudioContext.state === 'suspended') {
+						window.GodotAudioContext.resume().catch(function() {});
+					}
 					if (typeof GodotAudio !== 'undefined' && GodotAudio.ctx && GodotAudio.ctx.state === 'suspended') {
 						GodotAudio.ctx.resume().catch(function() {});
 					}
 				} catch (e) {}
 				setTimeout(updateAudioHint, 200);
+			}
+
+			const hintEl = document.getElementById('audio-hint');
+			if (hintEl) {
+				hintEl.addEventListener('click', resumeAllAudio);
 			}
 
 			['click', 'pointerdown', 'mousedown', 'keydown', 'touchstart'].forEach(type => {
@@ -168,10 +179,15 @@ body {
 			});
 
 			window.addEventListener('message', function(event) {
-				if (event.data === 'resume_audio') {
+				if (event.data === 'resume_audio' || event.data === 'start_game') {
 					resumeAllAudio();
 				}
 			});
+
+			window.__resumeGodotAudio = resumeAllAudio;
+			setInterval(updateAudioHint, 1000);
+		})();
+		</script>
 
 			window.__resumeGodotAudio = resumeAllAudio;
 			setInterval(updateAudioHint, 1000);
