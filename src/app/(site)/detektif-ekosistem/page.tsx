@@ -117,12 +117,10 @@ export default function DetektifEkosistemPage() {
             videoWebm="/work/detektif-ekosistem/menu-loop.webm"
             videoMp4="/work/detektif-ekosistem/menu-loop.mp4"
             poster="/work/detektif-ekosistem/stage-poster.webp"
-            gameSrc="/games/detektif/index.html"
-            downloadUrl="https://drive.google.com/file/d/1vG9aKz4sgGhr4X1aoxixbJWitFqMHBbx/view"
+            themeAudio="/work/detektif-ekosistem/theme.mp3"
+            downloadUrl="/detektif-ekosistem/download"
+            mirrorUrl="https://drive.google.com/file/d/1vG9aKz4sgGhr4X1aoxixbJWitFqMHBbx/view"
           />
-          <p className="small muted detektif-player-note">
-            * Putar langsung di browser (klik Play) dengan audio aktif, atau unduh versi desktop (.exe) untuk performa maksimal.
-          </p>
         </div>
 
         <div className="detektif-hero-info">
