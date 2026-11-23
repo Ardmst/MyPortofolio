@@ -111,6 +111,21 @@ export function DetektifPlayer({
           <span>Download Game (.exe)</span>
           <span className="detektif-btn-badge">270 MB · Windows</span>
         </a>
+
+        <a
+          className="button detektif-download-btn"
+          href="/Instrumen_Penilaian_Ahli_Detektif_Ekosistem.docx"
+          download="Instrumen_Penilaian_Ahli_Detektif_Ekosistem.docx"
+          title="Unduh Lembar Evaluasi & Validasi Ahli (.docx)"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeLinecap="round" strokeLinejoin="round" />
+            <polyline points="14 2 14 8 20 8" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="16" y1="13" x2="8" y2="13" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="16" y1="17" x2="8" y2="17" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span>Instrumen Ahli (.docx)</span>
+        </a>
       </div>
 
       <p className="small muted detektif-player-note">
