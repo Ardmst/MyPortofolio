@@ -117,9 +117,8 @@ export default function DetektifEkosistemPage() {
             videoWebm="/work/detektif-ekosistem/menu-loop.webm"
             videoMp4="/work/detektif-ekosistem/menu-loop.mp4"
             poster="/work/detektif-ekosistem/stage-poster.webp"
-            themeAudio="/work/detektif-ekosistem/theme.mp3"
+            gameSrc="/games/detektif/index.html"
             downloadUrl="/detektif-ekosistem/download"
-            mirrorUrl="https://drive.google.com/file/d/1vG9aKz4sgGhr4X1aoxixbJWitFqMHBbx/view"
           />
         </div>
 
