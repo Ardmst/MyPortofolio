@@ -22,34 +22,13 @@ export function DetektifPlayer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [audioUnlocked, setAudioUnlocked] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const handleUnlockAudio = useCallback(() => {
-    try {
-      const frame = frameRef.current;
-      if (frame && frame.contentWindow) {
-        frame.contentWindow.focus();
-        frame.contentWindow.postMessage("resume_audio", "*");
-        // @ts-ignore
-        if (frame.contentWindow.__resumeGodotAudio) {
-          // @ts-ignore
-          frame.contentWindow.__resumeGodotAudio();
-        }
-        // @ts-ignore
-        if (frame.contentWindow.GodotAudioContext) {
-          // @ts-ignore
-          frame.contentWindow.GodotAudioContext.resume().catch(() => {});
-        }
-      }
-      setAudioUnlocked(true);
-    } catch {}
-  }, []);
-
-  // Auto-play video loop in view
+  // Auto-play video loop in preview mode
   useEffect(() => {
     const video = videoRef.current;
     if (!video || isPlaying) return;
@@ -65,14 +44,25 @@ export function DetektifPlayer({
     return () => document.removeEventListener("fullscreenchange", onFSChange);
   }, []);
 
+  // Listen to audio status messages from iframe
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === "godot_audio_status") {
+        if (typeof event.data.muted === "boolean") {
+          setIsMuted(event.data.muted);
+        }
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
   const handleStartPlay = useCallback(() => {
     if (!isPlaying) {
       setIsPlaying(true);
       setIsLoading(true);
-      setTimeout(handleUnlockAudio, 500);
-      setTimeout(handleUnlockAudio, 1500);
     }
-  }, [isPlaying, handleUnlockAudio]);
+  }, [isPlaying]);
 
   const handleRestart = useCallback(() => {
     setRunKey((k) => k + 1);
@@ -86,6 +76,17 @@ export function DetektifPlayer({
     } else {
       document.exitFullscreen().catch(() => {});
     }
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    try {
+      const frame = frameRef.current;
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.focus();
+        frame.contentWindow.postMessage("toggle_audio", "*");
+      }
+      setIsMuted((prev) => !prev);
+    } catch {}
   }, []);
 
   const onFrameLoad = () => {
@@ -168,50 +169,68 @@ export function DetektifPlayer({
               </div>
             )}
 
-            {/* Floating In-Game Controls */}
+            {/* Single Unified In-Game Floating Controls */}
             <div className="detektif-float-controls">
+              {/* 1. Audio Toggle (Mute / Unmute) */}
               <button
                 type="button"
                 className="detektif-pill-btn"
-                onClick={handleUnlockAudio}
-                title="Aktifkan / Pastikan Suara Game Nyala"
+                onClick={toggleMute}
+                title={isMuted ? "Klik untuk mengaktifkan suara" : "Klik untuk mute suara"}
+                aria-label={isMuted ? "Unmute suara" : "Mute suara"}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" strokeLinecap="round" />
-                </svg>
-                <span>{audioUnlocked ? "Suara Aktif" : "Aktifkan Suara"}</span>
+                {isMuted ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                      <line x1="23" y1="9" x2="17" y2="15" />
+                      <line x1="17" y1="9" x2="23" y2="15" />
+                    </svg>
+                    <span>Mute</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" strokeLinecap="round" />
+                    </svg>
+                    <span>Suara On</span>
+                  </>
+                )}
               </button>
 
+              {/* 2. Fullscreen Toggle */}
               <button
                 type="button"
                 className="detektif-pill-btn"
                 onClick={toggleFullscreen}
-                title={isFullscreen ? "Minimize / Perkecil" : "Maximize / Layar Penuh"}
-                aria-label={isFullscreen ? "Minimize layar" : "Maximize layar"}
+                title={isFullscreen ? "Keluar Layar Penuh" : "Layar Penuh"}
+                aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
               >
                 {isFullscreen ? (
                   <>
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M5 1v4H1M11 1v4h4M5 15v-4H1M11 15v-4h4" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span>Minimize</span>
+                    <span>Exit Fullscreen</span>
                   </>
                 ) : (
                   <>
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M1 5V1h4M15 5V1h-4M1 11v4h4M15 11v4h-4" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span>Maximize</span>
+                    <span>Fullscreen</span>
                   </>
                 )}
               </button>
 
+              {/* 3. Restart Game */}
               <button
                 type="button"
                 className="detektif-pill-btn"
                 onClick={handleRestart}
                 title="Mulai Ulang Game"
+                aria-label="Restart game"
               >
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M1 8a7 7 0 1 0 2-4.9L1 5" strokeLinecap="round" strokeLinejoin="round" />
@@ -224,7 +243,7 @@ export function DetektifPlayer({
         )}
       </div>
 
-      {/* Action Buttons Under the Media Box */}
+      {/* Action Buttons Under the Media Box (Clean, No Duplicate Buttons) */}
       <div className="detektif-actions-group">
         {!isPlaying ? (
           <button
@@ -237,15 +256,7 @@ export function DetektifPlayer({
             </svg>
             <span>Play it here</span>
           </button>
-        ) : (
-          <button
-            type="button"
-            className="button detektif-primary-btn"
-            onClick={toggleFullscreen}
-          >
-            {isFullscreen ? "Minimize Layar" : "Maximize / Fullscreen"}
-          </button>
-        )}
+        ) : null}
 
         <a
           className="button detektif-download-btn"
@@ -260,16 +271,6 @@ export function DetektifPlayer({
           </svg>
           <span>Download Game (.exe)</span>
         </a>
-
-        {isPlaying && (
-          <button
-            type="button"
-            className="link detektif-restart-link"
-            onClick={handleRestart}
-          >
-            Restart Game
-          </button>
-        )}
       </div>
     </div>
   );

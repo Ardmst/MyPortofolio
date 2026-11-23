@@ -114,15 +114,19 @@ body {
 		</div>
 
 		<script>
-		// --- WebAudio Autoplay & Resume Interceptor for Godot 4 HTML5 ---
+		// --- WebAudio Autoplay, Mute Toggle & Resume Interceptor for Godot 4 HTML5 ---
 		(function() {
 			const allContexts = new Set();
+			let userMuted = false;
 			const OrigAudioContext = window.AudioContext || window.webkitAudioContext;
 			if (OrigAudioContext) {
 				const PatchedAudioContext = function(options) {
 					const ctx = new OrigAudioContext(options);
 					allContexts.add(ctx);
-					ctx.addEventListener('statechange', updateAudioHint);
+					ctx.addEventListener('statechange', function() {
+						updateAudioHint();
+						notifyParentAudioState();
+					});
 					return ctx;
 				};
 				PatchedAudioContext.prototype = OrigAudioContext.prototype;
@@ -132,9 +136,27 @@ body {
 				}
 			}
 
+			function notifyParentAudioState() {
+				let state = 'unknown';
+				if (window.GodotAudioContext) {
+					state = window.GodotAudioContext.state;
+				}
+				try {
+					window.parent.postMessage({
+						type: 'godot_audio_status',
+						state: state,
+						muted: userMuted || state !== 'running'
+					}, '*');
+				} catch(e) {}
+			}
+
 			function updateAudioHint() {
 				const hint = document.getElementById('audio-hint');
 				if (!hint) return;
+				if (userMuted) {
+					hint.style.display = 'none';
+					return;
+				}
 				let hasSuspended = false;
 				allContexts.forEach(ctx => {
 					if (ctx && ctx.state === 'suspended') hasSuspended = true;
@@ -152,6 +174,7 @@ body {
 			}
 
 			function resumeAllAudio() {
+				userMuted = false;
 				allContexts.forEach(ctx => {
 					if (ctx && ctx.state === 'suspended') {
 						ctx.resume().catch(function() {});
@@ -165,7 +188,31 @@ body {
 						GodotAudio.ctx.resume().catch(function() {});
 					}
 				} catch (e) {}
-				setTimeout(updateAudioHint, 200);
+				setTimeout(() => {
+					updateAudioHint();
+					notifyParentAudioState();
+				}, 150);
+			}
+
+			function muteAllAudio() {
+				userMuted = true;
+				try {
+					if (window.GodotAudioContext && window.GodotAudioContext.state === 'running') {
+						window.GodotAudioContext.suspend().catch(function() {});
+					}
+				} catch (e) {}
+				setTimeout(() => {
+					updateAudioHint();
+					notifyParentAudioState();
+				}, 150);
+			}
+
+			function toggleAudio() {
+				if (window.GodotAudioContext && window.GodotAudioContext.state === 'running' && !userMuted) {
+					muteAllAudio();
+				} else {
+					resumeAllAudio();
+				}
 			}
 
 			const hintEl = document.getElementById('audio-hint');
@@ -174,17 +221,28 @@ body {
 			}
 
 			['click', 'pointerdown', 'mousedown', 'keydown', 'touchstart'].forEach(type => {
-				window.addEventListener(type, resumeAllAudio, { capture: true, passive: true });
-				document.addEventListener(type, resumeAllAudio, { capture: true, passive: true });
+				window.addEventListener(type, function() {
+					if (!userMuted) resumeAllAudio();
+				}, { capture: true, passive: true });
+				document.addEventListener(type, function() {
+					if (!userMuted) resumeAllAudio();
+				}, { capture: true, passive: true });
 			});
 
 			window.addEventListener('message', function(event) {
-				if (event.data === 'resume_audio' || event.data === 'start_game') {
+				if (event.data === 'resume_audio' || event.data === 'unmute_audio' || event.data === 'start_game') {
 					resumeAllAudio();
+				} else if (event.data === 'mute_audio') {
+					muteAllAudio();
+				} else if (event.data === 'toggle_audio') {
+					toggleAudio();
 				}
 			});
 
 			window.__resumeGodotAudio = resumeAllAudio;
+			window.__muteGodotAudio = muteAllAudio;
+			window.__toggleGodotAudio = toggleAudio;
+
 			setInterval(updateAudioHint, 1000);
 		})();
 		</script>
@@ -295,6 +353,11 @@ const engine = new Engine(GODOT_CONFIG);
 			},
 		}).then(() => {
 			setStatusMode('hidden');
+			if (window.__resumeGodotAudio) {
+				window.__resumeGodotAudio();
+				setTimeout(window.__resumeGodotAudio, 400);
+				setTimeout(window.__resumeGodotAudio, 1200);
+			}
 		}, displayFailureNotice);
 	}
 }());
