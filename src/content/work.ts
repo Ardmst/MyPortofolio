@@ -107,7 +107,7 @@ export const FEATURED: FeaturedProject[] = [
     live: {
       kind: "game",
       src: "/games/detektif/index.html",
-      page: "/play/detektif",
+      page: "/detektif-ekosistem",
       frameTitle: "Detektif Ekosistem, the game",
       clip: {
         webm: "/work/detektif-ekosistem/menu-loop.webm",

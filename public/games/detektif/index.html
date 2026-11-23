@@ -109,6 +109,74 @@ body {
 			<div id="status-notice"></div>
 		</div>
 
+		<div id="audio-hint" style="display:none; position:absolute; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(18,14,11,0.88); color:#f5efe6; padding:8px 18px; border-radius:24px; font-family:'Press Start 2P', monospace, sans-serif; font-size:11px; z-index:99; pointer-events:none; border:1px solid rgba(245,180,90,0.4); backdrop-filter:blur(6px); box-shadow:0 4px 16px rgba(0,0,0,0.6); letter-spacing:0.5px;">
+			🔊 Klik layar game untuk mengaktifkan audio
+		</div>
+
+		<script>
+		// --- WebAudio Autoplay & Resume Interceptor for Godot 4 HTML5 ---
+		(function() {
+			const allContexts = new Set();
+			const OrigAudioContext = window.AudioContext || window.webkitAudioContext;
+			if (OrigAudioContext) {
+				const PatchedAudioContext = function(options) {
+					const ctx = new OrigAudioContext(options);
+					allContexts.add(ctx);
+					ctx.addEventListener('statechange', updateAudioHint);
+					return ctx;
+				};
+				PatchedAudioContext.prototype = OrigAudioContext.prototype;
+				window.AudioContext = PatchedAudioContext;
+				if (window.webkitAudioContext) {
+					window.webkitAudioContext = PatchedAudioContext;
+				}
+			}
+
+			function updateAudioHint() {
+				const hint = document.getElementById('audio-hint');
+				if (!hint) return;
+				let hasSuspended = false;
+				allContexts.forEach(ctx => {
+					if (ctx && ctx.state === 'suspended') hasSuspended = true;
+				});
+				const status = document.getElementById('status');
+				const isEngineRunning = !status || status.style.visibility === 'hidden' || getComputedStyle(status).display === 'none';
+				if (hasSuspended && isEngineRunning) {
+					hint.style.display = 'block';
+				} else {
+					hint.style.display = 'none';
+				}
+			}
+
+			function resumeAllAudio() {
+				allContexts.forEach(ctx => {
+					if (ctx && ctx.state === 'suspended') {
+						ctx.resume().catch(function() {});
+					}
+				});
+				try {
+					if (typeof GodotAudio !== 'undefined' && GodotAudio.ctx && GodotAudio.ctx.state === 'suspended') {
+						GodotAudio.ctx.resume().catch(function() {});
+					}
+				} catch (e) {}
+				setTimeout(updateAudioHint, 200);
+			}
+
+			['click', 'pointerdown', 'mousedown', 'keydown', 'touchstart'].forEach(type => {
+				window.addEventListener(type, resumeAllAudio, { capture: true, passive: true });
+				document.addEventListener(type, resumeAllAudio, { capture: true, passive: true });
+			});
+
+			window.addEventListener('message', function(event) {
+				if (event.data === 'resume_audio') {
+					resumeAllAudio();
+				}
+			});
+
+			window.__resumeGodotAudio = resumeAllAudio;
+			setInterval(updateAudioHint, 1000);
+		})();
+		</script>
 		<script src="index.js"></script>
 		<script>
 const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":38838716,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
